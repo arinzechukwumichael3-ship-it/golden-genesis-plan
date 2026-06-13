@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import { CurrencySwitcher } from "@/components/site/CurrencySwitcher";
 
 export function Header() {
   const { user } = useAuth();
@@ -35,6 +36,7 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex items-center gap-7 text-sm font-medium">{navItems}</nav>
         <div className="hidden md:flex items-center gap-2">
+          <CurrencySwitcher />
           {user ? (
             <Button variant="outline" size="sm" onClick={signOut}>Sign out</Button>
           ) : (
@@ -51,6 +53,7 @@ export function Header() {
       {open && (
         <div className="md:hidden border-t border-white/5 px-4 py-4 flex flex-col gap-4 text-sm" onClick={() => setOpen(false)}>
           {navItems}
+          <div onClick={(e) => e.stopPropagation()}><CurrencySwitcher /></div>
           {user ? (
             <Button variant="outline" size="sm" onClick={signOut}>Sign out</Button>
           ) : (
