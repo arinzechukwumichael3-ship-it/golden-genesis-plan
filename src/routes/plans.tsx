@@ -3,6 +3,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Crown, Zap, Bitcoin, Clock, ShieldCheck, TrendingUp } from "lucide-react";
+import { useCurrency } from "@/lib/currency";
 
 export const Route = createFileRoute("/plans")({
   head: () => ({
