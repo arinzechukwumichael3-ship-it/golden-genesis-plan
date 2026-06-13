@@ -159,6 +159,19 @@ function Badge({ icon: Icon, children }: { icon: React.ComponentType<{ className
 
 function PlanCard({ plan }: { plan: PlanDef }) {
   const Icon = plan.icon;
+  const { info, fromEUR, format } = useCurrency();
+
+  const rows: { invest: string; earn: string; multiplier: string }[] =
+    plan.kind === "fiat"
+      ? (plan.fiatTiers ?? []).map((t) => ({
+          invest: format(fromEUR(t.investEUR)),
+          earn: format(fromEUR(t.earnEUR)),
+          multiplier: `${+(t.earnEUR / t.investEUR).toFixed(2)}×`,
+        }))
+      : (plan.btcTiers ?? []);
+
+  const denom = plan.kind === "fiat" ? `${info.code} denominated` : "BTC denominated";
+
   return (
     <Card
       className={`surface-card border-white/5 relative overflow-hidden flex flex-col ${
@@ -181,7 +194,7 @@ function PlanCard({ plan }: { plan: PlanDef }) {
           </div>
           <div>
             <h3 className="text-2xl font-bold leading-none">{plan.name}</h3>
-            <div className="text-xs text-muted-foreground mt-1">{plan.currency} denominated</div>
+            <div className="text-xs text-muted-foreground mt-1">{denom}</div>
           </div>
         </div>
         <p className="text-sm text-muted-foreground mb-6">{plan.tagline}</p>
@@ -193,7 +206,7 @@ function PlanCard({ plan }: { plan: PlanDef }) {
             <span className="text-right">Earn</span>
           </div>
           <div className="divide-y divide-white/5">
-            {plan.tiers.map((t, i) => (
+            {rows.map((t, i) => (
               <div
                 key={i}
                 className="grid grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 text-sm hover:bg-[var(--gold)]/[0.04] transition-colors"
