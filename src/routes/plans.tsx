@@ -19,15 +19,17 @@ export const Route = createFileRoute("/plans")({
   component: Plans,
 });
 
-type Tier = { invest: string; earn: string; multiplier: string };
+type FiatTier = { investEUR: number; earnEUR: number };
+type BtcTier = { invest: string; earn: string; multiplier: string };
 type PlanDef = {
   slug: string;
   name: string;
   tagline: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: string;
-  currency: "EUR" | "BTC";
-  tiers: Tier[];
+  kind: "fiat" | "btc";
+  fiatTiers?: FiatTier[];
+  btcTiers?: BtcTier[];
   features: string[];
   featured?: boolean;
 };
@@ -38,13 +40,13 @@ const PLANS: PlanDef[] = [
     name: "Basic Plan",
     tagline: "Entry tier copy trading for steady, fast returns.",
     icon: Zap,
-    currency: "EUR",
-    tiers: [
-      { invest: "€500", earn: "€1,000", multiplier: "2×" },
-      { invest: "€600", earn: "€1,500", multiplier: "2.5×" },
-      { invest: "€700", earn: "€1,800", multiplier: "2.57×" },
-      { invest: "€800", earn: "€2,000", multiplier: "2.5×" },
-      { invest: "€900", earn: "€2,500", multiplier: "2.78×" },
+    kind: "fiat",
+    fiatTiers: [
+      { investEUR: 500, earnEUR: 1000 },
+      { investEUR: 600, earnEUR: 1500 },
+      { investEUR: 700, earnEUR: 1800 },
+      { investEUR: 800, earnEUR: 2000 },
+      { investEUR: 900, earnEUR: 2500 },
     ],
     features: [
       "USDT / BTC deposits accepted",
@@ -59,16 +61,16 @@ const PLANS: PlanDef[] = [
     tagline: "Higher allocations, accelerated multipliers, priority desk.",
     icon: Crown,
     badge: "MOST POPULAR",
-    currency: "EUR",
+    kind: "fiat",
     featured: true,
-    tiers: [
-      { invest: "€1,000", earn: "€5,000", multiplier: "5×" },
-      { invest: "€1,500", earn: "€7,000", multiplier: "4.67×" },
-      { invest: "€2,000", earn: "€10,000", multiplier: "5×" },
-      { invest: "€3,000", earn: "€15,000", multiplier: "5×" },
-      { invest: "€4,000", earn: "€20,000", multiplier: "5×" },
-      { invest: "€5,000", earn: "€50,000", multiplier: "10×" },
-      { invest: "€10,000", earn: "€100,000", multiplier: "10×" },
+    fiatTiers: [
+      { investEUR: 1000, earnEUR: 5000 },
+      { investEUR: 1500, earnEUR: 7000 },
+      { investEUR: 2000, earnEUR: 10000 },
+      { investEUR: 3000, earnEUR: 15000 },
+      { investEUR: 4000, earnEUR: 20000 },
+      { investEUR: 5000, earnEUR: 50000 },
+      { investEUR: 10000, earnEUR: 100000 },
     ],
     features: [
       "Dedicated VIP trading desk",
@@ -82,8 +84,8 @@ const PLANS: PlanDef[] = [
     name: "Premium Plan",
     tagline: "Native BTC allocations. Whale-tier copy trading.",
     icon: Bitcoin,
-    currency: "BTC",
-    tiers: [
+    kind: "btc",
+    btcTiers: [
       { invest: "1 BTC", earn: "3 BTC", multiplier: "3×" },
       { invest: "2 BTC", earn: "6 BTC", multiplier: "3×" },
       { invest: "3 BTC", earn: "9 BTC", multiplier: "3×" },
