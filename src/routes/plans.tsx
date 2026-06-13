@@ -1,85 +1,224 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-
-type Plan = { id: string; name: string; slug: string; min_amount: number; roi_percent: number; sort_order: number };
-const DURATIONS = [30, 60, 90, 180, 365];
+import { Check, Crown, Zap, Bitcoin, Clock, ShieldCheck, TrendingUp } from "lucide-react";
 
 export const Route = createFileRoute("/plans")({
   head: () => ({
     meta: [
-      { title: "Investment Plans — YieldEmpireCapital" },
-      { name: "description", content: "Basic, Pro, and VIP investment plans with monthly ROI from 8% to 25%. Choose your duration and see estimated returns." },
+      { title: "BTC/USDT Copy Trading Plans — YieldEmpireCapital" },
+      {
+        name: "description",
+        content:
+          "Professional BTC & USDT copy trading plans. Basic, VIP, and Premium tiers with fixed returns paid out within 72 hours.",
+      },
     ],
   }),
   component: Plans,
 });
 
-function Plans() {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  useEffect(() => {
-    supabase.from("plans").select("*").eq("active", true).order("sort_order").then(({ data }) => setPlans(data || []));
-  }, []);
+type Tier = { invest: string; earn: string; multiplier: string };
+type PlanDef = {
+  slug: string;
+  name: string;
+  tagline: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge?: string;
+  currency: "EUR" | "BTC";
+  tiers: Tier[];
+  features: string[];
+  featured?: boolean;
+};
 
+const PLANS: PlanDef[] = [
+  {
+    slug: "basic",
+    name: "Basic Plan",
+    tagline: "Entry tier copy trading for steady, fast returns.",
+    icon: Zap,
+    currency: "EUR",
+    tiers: [
+      { invest: "€500", earn: "€1,000", multiplier: "2×" },
+      { invest: "€600", earn: "€1,500", multiplier: "2.5×" },
+      { invest: "€700", earn: "€1,800", multiplier: "2.57×" },
+      { invest: "€800", earn: "€2,000", multiplier: "2.5×" },
+      { invest: "€900", earn: "€2,500", multiplier: "2.78×" },
+    ],
+    features: [
+      "USDT / BTC deposits accepted",
+      "Auto copy-trade signals",
+      "Payouts within 72 hours",
+      "Email + dashboard updates",
+    ],
+  },
+  {
+    slug: "vip",
+    name: "VIP Plan",
+    tagline: "Higher allocations, accelerated multipliers, priority desk.",
+    icon: Crown,
+    badge: "MOST POPULAR",
+    currency: "EUR",
+    featured: true,
+    tiers: [
+      { invest: "€1,000", earn: "€5,000", multiplier: "5×" },
+      { invest: "€1,500", earn: "€7,000", multiplier: "4.67×" },
+      { invest: "€2,000", earn: "€10,000", multiplier: "5×" },
+      { invest: "€3,000", earn: "€15,000", multiplier: "5×" },
+      { invest: "€4,000", earn: "€20,000", multiplier: "5×" },
+      { invest: "€5,000", earn: "€50,000", multiplier: "10×" },
+      { invest: "€10,000", earn: "€100,000", multiplier: "10×" },
+    ],
+    features: [
+      "Dedicated VIP trading desk",
+      "Priority payout queue (72h)",
+      "Advanced risk-managed strategies",
+      "1-on-1 account manager",
+    ],
+  },
+  {
+    slug: "premium",
+    name: "Premium Plan",
+    tagline: "Native BTC allocations. Whale-tier copy trading.",
+    icon: Bitcoin,
+    currency: "BTC",
+    tiers: [
+      { invest: "1 BTC", earn: "3 BTC", multiplier: "3×" },
+      { invest: "2 BTC", earn: "6 BTC", multiplier: "3×" },
+      { invest: "3 BTC", earn: "9 BTC", multiplier: "3×" },
+      { invest: "4 BTC", earn: "12 BTC", multiplier: "3×" },
+      { invest: "5 BTC", earn: "15 BTC", multiplier: "3×" },
+    ],
+    features: [
+      "Native BTC settlement",
+      "Institutional-grade execution",
+      "Cold-storage custody option",
+      "White-glove onboarding",
+    ],
+  },
+];
+
+function Plans() {
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-7xl px-4 py-20 text-center">
-        <div className="text-sm uppercase tracking-widest text-[var(--gold)] mb-2">Investment plans</div>
-        <h1 className="text-5xl md:text-6xl font-bold mb-4">Choose the plan that fits you</h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">Pick a plan, set an amount, choose a duration. We'll show your estimated return instantly.</p>
+      <section className="mx-auto max-w-7xl px-4 pt-20 pb-10 text-center">
+        <div className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[var(--gold)] mb-4">
+          <span className="h-px w-8 bg-[var(--gold)]/60" />
+          BTC / USDT Copy Trading
+          <span className="h-px w-8 bg-[var(--gold)]/60" />
+        </div>
+        <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
+          Professional <span className="gold-text">Copy Trading</span> Plans
+        </h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+          Mirror our institutional desk in real time. Fixed-return tiers across BTC and USDT —
+          settlement guaranteed within 72 hours of confirmed deposit.
+        </p>
+
+        <div className="mt-8 flex flex-wrap justify-center gap-3 text-xs">
+          <Badge icon={Clock}>72-hour payout</Badge>
+          <Badge icon={ShieldCheck}>Risk-managed strategy</Badge>
+          <Badge icon={TrendingUp}>Up to 10× multiplier</Badge>
+        </div>
       </section>
-      <section className="mx-auto max-w-7xl px-4 pb-24 grid md:grid-cols-3 gap-6">
-        {plans.map((p, i) => <PlanCard key={p.id} plan={p} featured={i === 1} />)}
+
+      <section className="mx-auto max-w-7xl px-4 pb-24 grid lg:grid-cols-3 gap-6">
+        {PLANS.map((p) => <PlanCard key={p.slug} plan={p} />)}
+      </section>
+
+      <section className="mx-auto max-w-4xl px-4 pb-24">
+        <Card className="surface-card border-[var(--gold)]/20">
+          <CardContent className="p-8 md:p-10 text-center">
+            <Clock className="w-10 h-10 mx-auto text-[var(--gold)] mb-3" />
+            <h2 className="text-2xl md:text-3xl font-bold mb-3">
+              Return on investment within <span className="gold-text">72 hours</span>
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Once your deposit is confirmed on-chain, our desk activates your copy-trade
+              allocation immediately. Profits land back in your wallet within 72 hours — every
+              tier, every time. 🤝
+            </p>
+          </CardContent>
+        </Card>
       </section>
     </SiteLayout>
   );
 }
 
-function PlanCard({ plan, featured }: { plan: Plan; featured: boolean }) {
-  const [amount, setAmount] = useState(plan.min_amount);
-  const [duration, setDuration] = useState(90);
-  const estimated = +(amount * (plan.roi_percent / 100) * (duration / 30)).toFixed(2);
-
+function Badge({ icon: Icon, children }: { icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
   return (
-    <Card className={`surface-card border-white/5 relative ${featured ? "glow-gold" : ""}`}>
-      {featured && <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-black text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</div>}
-      <CardContent className="p-8">
-        <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
-        <p className="text-sm text-muted-foreground mb-5">Min ${plan.min_amount.toLocaleString()}</p>
-        <div className="flex items-baseline gap-1 mb-6">
-          <span className="text-5xl font-bold gold-text">{plan.roi_percent}%</span>
-          <span className="text-muted-foreground">monthly ROI</span>
+    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-white/10 bg-white/5 text-muted-foreground">
+      <Icon className="w-3.5 h-3.5 text-[var(--gold)]" />
+      {children}
+    </span>
+  );
+}
+
+function PlanCard({ plan }: { plan: PlanDef }) {
+  const Icon = plan.icon;
+  return (
+    <Card
+      className={`surface-card border-white/5 relative overflow-hidden flex flex-col ${
+        plan.featured ? "glow-gold border-[var(--gold)]/40 lg:scale-[1.03]" : ""
+      }`}
+    >
+      {plan.featured && (
+        <div className="absolute top-0 inset-x-0 h-1 gold-gradient" />
+      )}
+      {plan.badge && (
+        <div className="absolute top-4 right-4 gold-gradient text-black text-[10px] font-bold tracking-wider px-2.5 py-1 rounded-full">
+          {plan.badge}
         </div>
-        <div className="space-y-4">
-          <div>
-            <label className="text-xs text-muted-foreground">Amount (USD)</label>
-            <input
-              type="number"
-              min={plan.min_amount}
-              value={amount}
-              onChange={(e) => setAmount(Math.max(plan.min_amount, +e.target.value || 0))}
-              className="w-full mt-1 bg-input/50 border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
-            />
+      )}
+
+      <CardContent className="p-8 flex flex-col h-full">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-11 h-11 rounded-xl bg-[var(--gold)]/10 border border-[var(--gold)]/20 flex items-center justify-center">
+            <Icon className="w-5 h-5 text-[var(--gold)]" />
           </div>
           <div>
-            <label className="text-xs text-muted-foreground">Duration (days)</label>
-            <div className="grid grid-cols-5 gap-1 mt-1">
-              {DURATIONS.map((d) => (
-                <button key={d} onClick={() => setDuration(d)} className={`text-xs py-2 rounded-md border ${duration === d ? "gold-gradient text-black border-transparent font-semibold" : "border-white/10 hover:border-[var(--gold)]/50"}`}>{d}</button>
-              ))}
-            </div>
+            <h3 className="text-2xl font-bold leading-none">{plan.name}</h3>
+            <div className="text-xs text-muted-foreground mt-1">{plan.currency} denominated</div>
           </div>
-          <div className="surface-card rounded-lg p-4">
-            <div className="text-xs text-muted-foreground">Estimated return</div>
-            <div className="text-2xl font-bold gold-text tabular-nums">+${estimated.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Total payout: ${(amount + estimated).toLocaleString()}</div>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">{plan.tagline}</p>
+
+        <div className="rounded-lg border border-white/10 overflow-hidden mb-6">
+          <div className="grid grid-cols-[1fr_auto_1fr] text-[10px] uppercase tracking-wider text-muted-foreground bg-white/[0.03] px-4 py-2">
+            <span>Invest</span>
+            <span className="text-center">→</span>
+            <span className="text-right">Earn</span>
           </div>
-          <Button className="w-full gold-gradient text-black hover:opacity-90" asChild>
-            <Link to="/invest" search={{ plan: plan.slug, amount, duration }}>Invest now</Link>
+          <div className="divide-y divide-white/5">
+            {plan.tiers.map((t, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[1fr_auto_1fr] items-center px-4 py-2.5 text-sm hover:bg-[var(--gold)]/[0.04] transition-colors"
+              >
+                <span className="font-semibold tabular-nums">{t.invest}</span>
+                <span className="text-[10px] font-bold gold-text px-2">{t.multiplier}</span>
+                <span className="text-right font-bold gold-text tabular-nums">{t.earn}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <ul className="space-y-2 mb-6 text-sm">
+          {plan.features.map((f) => (
+            <li key={f} className="flex items-start gap-2">
+              <Check className="w-4 h-4 text-[var(--gold)] mt-0.5 shrink-0" />
+              <span className="text-muted-foreground">{f}</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-auto pt-2">
+          <Button asChild className="w-full gold-gradient text-black hover:opacity-90 h-11 font-semibold">
+            <Link to="/auth">Start {plan.name}</Link>
           </Button>
+          <p className="text-[11px] text-center text-muted-foreground mt-3">
+            Payout within 72 hours of confirmed deposit
+          </p>
         </div>
       </CardContent>
     </Card>
