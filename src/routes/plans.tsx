@@ -1,86 +1,139 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
 
-type Plan = { id: string; name: string; slug: string; min_amount: number; roi_percent: number; sort_order: number };
-const DURATIONS = [30, 60, 90, 180, 365];
+type PlanEntry = { invest: string; earn: string };
+type Plan = {
+  name: string;
+  tagline: string;
+  symbol: string;
+  entries: PlanEntry[];
+  highlight: string;
+  description: string;
+  featured?: boolean;
+};
+
+const PLANS: Plan[] = [
+  {
+    name: "Basic Plan",
+    symbol: "EUR",
+    tagline: "Short-term USDT copy trading with guaranteed tier payouts.",
+    highlight: "Double your capital within 72 hours.",
+    description: "Perfect for new traders seeking fast, predictable returns on small capital.",
+    entries: [
+      { invest: "€500", earn: "€1,000" },
+      { invest: "€600", earn: "€1,500" },
+      { invest: "€700", earn: "€1,800" },
+      { invest: "€800", earn: "€2,000" },
+      { invest: "€900", earn: "€2,500" },
+    ],
+  },
+  {
+    name: "VIP Plan",
+    symbol: "EUR",
+    tagline: "Premium copy trading with higher tiers and elite return multipliers.",
+    highlight: "Top-tier strategy designed for serious investors.",
+    description: "Designed for high-net-worth clients looking for aggressive growth and rapid capital expansion.",
+    featured: true,
+    entries: [
+      { invest: "€1,000", earn: "€5,000" },
+      { invest: "€1,500", earn: "€7,000" },
+      { invest: "€2,000", earn: "€10,000" },
+      { invest: "€3,000", earn: "€15,000" },
+      { invest: "€4,000", earn: "€20,000" },
+      { invest: "€5,000", earn: "€50,000" },
+      { invest: "€10,000", earn: "€100,000" },
+    ],
+  },
+  {
+    name: "Premium Plan",
+    symbol: "BTC",
+    tagline: "Advanced BTC copy trading for maximum market leverage.",
+    highlight: "Triple your BTC position in just 72 hours.",
+    description: "Premium BTC-only tier for experienced crypto investors seeking the highest upside.",
+    entries: [
+      { invest: "1 BTC", earn: "3 BTC" },
+      { invest: "2 BTC", earn: "6 BTC" },
+      { invest: "3 BTC", earn: "9 BTC" },
+      { invest: "4 BTC", earn: "12 BTC" },
+      { invest: "5 BTC", earn: "15 BTC" },
+    ],
+  },
+];
 
 export const Route = createFileRoute("/plans")({
   head: () => ({
     meta: [
-      { title: "Investment Plans — YieldEmpireCapital" },
-      { name: "description", content: "Basic, Pro, and VIP investment plans with monthly ROI from 8% to 25%. Choose your duration and see estimated returns." },
+      { title: "BTC/USDT Copy Trading Plans — YieldEmpireCapital" },
+      { name: "description", content: "Professional BTC and USDT copy trading plans with tiered returns and 72-hour payout windows." },
     ],
   }),
   component: Plans,
 });
 
 function Plans() {
-  const [plans, setPlans] = useState<Plan[]>([]);
-  useEffect(() => {
-    supabase.from("plans").select("*").eq("active", true).order("sort_order").then(({ data }) => setPlans(data || []));
-  }, []);
-
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-7xl px-4 py-20 text-center">
-        <div className="text-sm uppercase tracking-widest text-[var(--gold)] mb-2">Investment plans</div>
-        <h1 className="text-5xl md:text-6xl font-bold mb-4">Choose the plan that fits you</h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">Pick a plan, set an amount, choose a duration. We'll show your estimated return instantly.</p>
+      <section className="mx-auto max-w-6xl px-4 py-20 text-center">
+        <div className="text-sm uppercase tracking-widest text-[var(--gold)] mb-3">BTC / USDT Copy Trading Plans</div>
+        <h1 className="text-5xl md:text-6xl font-bold mb-4">Advanced short-term crypto growth engineered for high performance.</h1>
+        <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
+          Choose from our professionally managed tiered plans. Returns are credited within 72 hours after payment, backed by our copy trading execution models.
+        </p>
       </section>
-      <section className="mx-auto max-w-7xl px-4 pb-24 grid md:grid-cols-3 gap-6">
-        {plans.map((p, i) => <PlanCard key={p.id} plan={p} featured={i === 1} />)}
+
+      <section className="mx-auto max-w-7xl px-4 pb-24 grid gap-6 lg:grid-cols-3">
+        {PLANS.map((plan) => (
+          <PlanCard key={plan.name} plan={plan} />
+        ))}
       </section>
     </SiteLayout>
   );
 }
 
-function PlanCard({ plan, featured }: { plan: Plan; featured: boolean }) {
-  const [amount, setAmount] = useState(plan.min_amount);
-  const [duration, setDuration] = useState(90);
-  const estimated = +(amount * (plan.roi_percent / 100) * (duration / 30)).toFixed(2);
-
+function PlanCard({ plan }: { plan: Plan }) {
   return (
-    <Card className={`surface-card border-white/5 relative ${featured ? "glow-gold" : ""}`}>
-      {featured && <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-black text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</div>}
+    <Card className={`surface-card border-white/10 relative overflow-hidden ${plan.featured ? "glow-gold shadow-2xl shadow-[rgba(252,211,77,0.18)]" : ""}`}>
+      {plan.featured && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-black text-xs font-bold px-3 py-1 rounded-full">
+          VIP SELECTION
+        </div>
+      )}
+
       <CardContent className="p-8">
-        <h3 className="text-2xl font-bold mb-1">{plan.name}</h3>
-        <p className="text-sm text-muted-foreground mb-5">Min ${plan.min_amount.toLocaleString()}</p>
-        <div className="flex items-baseline gap-1 mb-6">
-          <span className="text-5xl font-bold gold-text">{plan.roi_percent}%</span>
-          <span className="text-muted-foreground">monthly ROI</span>
-        </div>
-        <div className="space-y-4">
+        <div className="flex items-center justify-between gap-4 mb-6">
           <div>
-            <label className="text-xs text-muted-foreground">Amount (USD)</label>
-            <input
-              type="number"
-              min={plan.min_amount}
-              value={amount}
-              onChange={(e) => setAmount(Math.max(plan.min_amount, +e.target.value || 0))}
-              className="w-full mt-1 bg-input/50 border border-white/10 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--gold)]"
-            />
+            <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+            <p className="text-sm text-muted-foreground leading-6">{plan.tagline}</p>
           </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Duration (days)</label>
-            <div className="grid grid-cols-5 gap-1 mt-1">
-              {DURATIONS.map((d) => (
-                <button key={d} onClick={() => setDuration(d)} className={`text-xs py-2 rounded-md border ${duration === d ? "gold-gradient text-black border-transparent font-semibold" : "border-white/10 hover:border-[var(--gold)]/50"}`}>{d}</button>
-              ))}
-            </div>
+          <div className="text-right">
+            <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Asset class</div>
+            <div className="mt-2 text-lg font-semibold gold-text">{plan.symbol}</div>
           </div>
-          <div className="surface-card rounded-lg p-4">
-            <div className="text-xs text-muted-foreground">Estimated return</div>
-            <div className="text-2xl font-bold gold-text tabular-nums">+${estimated.toLocaleString()}</div>
-            <div className="text-xs text-muted-foreground">Total payout: ${(amount + estimated).toLocaleString()}</div>
-          </div>
-          <Button className="w-full gold-gradient text-black hover:opacity-90" asChild>
-            <Link to="/invest" search={{ plan: plan.slug, amount, duration }}>Invest now</Link>
-          </Button>
         </div>
+
+        <div className="rounded-3xl border border-white/10 bg-[rgba(255,255,255,0.02)] p-5 mb-6">
+          <div className="text-sm text-muted-foreground mb-3">Return structure</div>
+          <div className="space-y-3">
+            {plan.entries.map((entry) => (
+              <div key={`${entry.invest}-${entry.earn}`} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm">
+                <span>{entry.invest}</span>
+                <span className="font-semibold text-[var(--gold)]">{entry.earn}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mb-6 space-y-2">
+          <p className="text-sm text-muted-foreground">{plan.description}</p>
+          <p className="text-sm font-medium text-[var(--gold)]">{plan.highlight}</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">Payout window: 72 hours after payment</p>
+        </div>
+
+        <Button className="w-full gold-gradient text-black hover:opacity-95" asChild>
+          <Link to="/auth" search={{ mode: "register" }}>Start this plan</Link>
+        </Button>
       </CardContent>
     </Card>
   );

@@ -9,8 +9,8 @@ import heroVideo from "@/assets/hero.mp4.asset.json";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "YieldEmpireCapital — Smart Crypto Investments" },
-      { name: "description", content: "Earn up to 25% ROI on BTC, ETH, USDT, and BNB. Institutional-grade crypto investment plans with referral rewards." },
+      { title: "YieldEmpireCapital — BTC/USDT Copy Trading" },
+      { name: "description", content: "Professional BTC and USDT copy trading plans with tiered 72-hour payouts. Choose Basic, VIP, or Premium strategies for fast crypto growth." },
     ],
   }),
   component: Home,
@@ -35,10 +35,10 @@ function Home() {
               <span className="text-muted-foreground">Trusted by 12,400+ investors</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold leading-[1.05] mb-6">
-              Build wealth.<br /><span className="gold-text">Earn in crypto.</span>
+              Professional crypto income.<br /><span className="gold-text">Copy trading in BTC & USDT.</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-lg mb-8">
-              Institutional-grade investment plans on BTC, ETH, USDT, and BNB. Up to 25% returns, transparent payouts, 24/7 withdrawals.
+              Premium BTC and USDT copy trading plans with tiered returns and verified 72-hour payouts. Deploy capital fast with our elite trading execution.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button size="lg" className="gold-gradient text-black hover:opacity-90 text-base h-12 px-7" asChild>
@@ -87,9 +87,9 @@ function Home() {
         </div>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { i: 1, t: "Create an account", d: "Sign up in seconds with email. Verify and you're ready to fund.", icon: Users },
-            { i: 2, t: "Deposit crypto", d: "Fund with BTC, ETH, USDT, or BNB. Confirmations in minutes.", icon: Wallet },
-            { i: 3, t: "Pick a plan & earn", d: "Choose Basic, Pro, or VIP. Watch returns compound daily.", icon: TrendingUp },
+            { i: 1, t: "Open your account", d: "Register quickly and secure your trading access in minutes.", icon: Users },
+            { i: 2, t: "Fund with BTC or USDT", d: "Deposit BTC or USDT and join our copy trading service immediately.", icon: Wallet },
+            { i: 3, t: "Choose a copy trading plan", d: "Select Basic, VIP, or Premium and receive returns in 72 hours.", icon: TrendingUp },
           ].map(({ i, t, d, icon: Icon }) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
               <Card className="surface-card border-white/5 h-full">
@@ -101,16 +101,16 @@ function Home() {
                   <h3 className="text-xl font-bold mb-2">{t}</h3>
                   <p className="text-muted-foreground text-sm">{d}</p>
                 </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+              {[
+                { n: "Basic", min: "€500 → €2,500", roi: "2x-5x return", f: ["USDT copy trading","72-hour payout","Low entry point"] },
+                { n: "VIP", min: "€1,000 → €100,000", roi: "5x-10x return", f: ["High-tier USDT strategy","Elite execution","Rapid growth"], featured: true },
+                { n: "Premium", min: "1-5 BTC", roi: "3x BTC return", f: ["BTC copy trading","Maximum leverage","Top-tier payouts"] },
+              ].map((p) => (
 
       {/* PLANS OVERVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-24">
         <div className="text-center mb-14">
-          <div className="text-sm uppercase tracking-widest text-[var(--gold)] mb-2">Investment plans</div>
+                    <p className="text-sm text-muted-foreground mb-6">{p.min}</p>
           <h2 className="text-4xl md:text-5xl font-bold">Plans built for every investor</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
