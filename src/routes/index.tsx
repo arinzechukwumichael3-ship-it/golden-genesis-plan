@@ -101,16 +101,15 @@ function Home() {
                   <h3 className="text-xl font-bold mb-2">{t}</h3>
                   <p className="text-muted-foreground text-sm">{d}</p>
                 </CardContent>
-              {[
-                { n: "Basic", min: "€500 → €2,500", roi: "2x-5x return", f: ["USDT copy trading","72-hour payout","Low entry point"] },
-                { n: "VIP", min: "€1,000 → €100,000", roi: "5x-10x return", f: ["High-tier USDT strategy","Elite execution","Rapid growth"], featured: true },
-                { n: "Premium", min: "1-5 BTC", roi: "3x BTC return", f: ["BTC copy trading","Maximum leverage","Top-tier payouts"] },
-              ].map((p) => (
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* PLANS OVERVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-24">
         <div className="text-center mb-14">
-                    <p className="text-sm text-muted-foreground mb-6">{p.min}</p>
           <h2 className="text-4xl md:text-5xl font-bold">Plans built for every investor</h2>
         </div>
         <div className="grid md:grid-cols-3 gap-6">
