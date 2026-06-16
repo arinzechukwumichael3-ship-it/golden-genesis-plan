@@ -37,27 +37,30 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.08 0.005 240);
+  --background: oklch(0.065 0.003 240);
   --foreground: oklch(0.98 0.005 240);
-  --card: oklch(0.12 0.008 240);
+  --card: oklch(0.10 0.006 240);
   --card-foreground: oklch(0.98 0.005 240);
-  --popover: oklch(0.12 0.008 240);
+  --popover: oklch(0.10 0.006 240);
   --popover-foreground: oklch(0.98 0.005 240);
-  --primary: oklch(0.82 0.16 86);
-  --primary-foreground: oklch(0.12 0.01 60);
-  --secondary: oklch(0.18 0.01 240);
+  --primary: oklch(0.78 0.19 155);
+  --primary-foreground: oklch(0.10 0.01 155);
+  --secondary: oklch(0.16 0.01 240);
   --secondary-foreground: oklch(0.98 0.005 240);
-  --muted: oklch(0.18 0.01 240);
-  --muted-foreground: oklch(0.65 0.015 240);
-  --accent: oklch(0.82 0.16 86);
-  --accent-foreground: oklch(0.12 0.01 60);
+  --muted: oklch(0.16 0.01 240);
+  --muted-foreground: oklch(0.58 0.015 240);
+  --accent: oklch(0.78 0.19 155);
+  --accent-foreground: oklch(0.10 0.01 155);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.98 0.005 240);
-  --border: oklch(0.22 0.01 240);
-  --input: oklch(0.18 0.01 240);
-  --ring: oklch(0.82 0.16 86);
-  --gold: oklch(0.82 0.16 86);
-  --gold-glow: oklch(0.88 0.18 92);
+  --border: oklch(0.20 0.01 240);
+  --input: oklch(0.16 0.01 240);
+  --ring: oklch(0.78 0.19 155);
+  /* --gold repurposed to vivid green — all class names (gold-gradient, gold-text, etc.) stay the same */
+  --gold: oklch(0.78 0.19 155);
+  --gold-glow: oklch(0.85 0.18 155);
+  --green: oklch(0.78 0.19 155);
+  --green-glow: oklch(0.85 0.18 155);
 }
 
 .dark { color-scheme: dark; }
@@ -68,32 +71,80 @@
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
 }
 
+/* ── Gold utilities repurposed to green (class names unchanged site-wide) ── */
 @utility gold-gradient {
-  background: linear-gradient(135deg, #f0b429 0%, #fbd249 50%, #f0b429 100%);
+  background: linear-gradient(135deg, #16DB93 0%, #2DE08E 50%, #16DB93 100%);
 }
 @utility gold-text {
-  background: linear-gradient(135deg, #fbd249, #f0b429);
+  background: linear-gradient(135deg, #2DE08E, #16DB93);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 @utility glow-gold {
-  box-shadow: 0 10px 40px -10px rgba(240,180,41,0.5), 0 0 0 1px rgba(240,180,41,0.2);
+  box-shadow: 0 10px 40px -10px rgba(22,219,147,0.45), 0 0 0 1px rgba(22,219,147,0.18);
 }
 @utility surface-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.06);
-  backdrop-filter: blur(8px);
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+  border: 1px solid rgba(22,219,147,0.08);
+  backdrop-filter: blur(12px);
 }
 
+/* ── Keyframes ── */
 @keyframes ticker-scroll {
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
-.ticker-track { animation: ticker-scroll 40s linear infinite; }
-
 @keyframes float-y {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
-.animate-float { animation: float-y 3s ease-in-out infinite; }
+@keyframes gradient-mesh {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to { background-position: -200% center; }
+}
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(22,219,147,0.25), 0 0 0 1px rgba(22,219,147,0.15);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(22,219,147,0.5), 0 0 100px rgba(22,219,147,0.15), 0 0 0 1px rgba(22,219,147,0.3);
+  }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Named animation classes ── */
+.ticker-track    { animation: ticker-scroll 40s linear infinite; }
+.animate-float   { animation: float-y 3s ease-in-out infinite; }
+.animate-glow-pulse { animation: glow-pulse 2.5s ease-in-out infinite; }
+.animate-marquee { animation: marquee 30s linear infinite; }
+.animate-spin-slow { animation: spin-slow 8s linear infinite; }
+.animate-shimmer-text {
+  background: linear-gradient(90deg, #16DB93 0%, #2DE08E 30%, #fff 50%, #2DE08E 70%, #16DB93 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ── Gradient mesh hero background ── */
+.gradient-mesh-bg {
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%, rgba(22,219,147,0.11) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 80%, rgba(45,224,142,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 50% 50%, rgba(22,219,147,0.04) 0%, transparent 70%);
+  background-size: 200% 200%;
+  animation: gradient-mesh 14s ease infinite;
+}
