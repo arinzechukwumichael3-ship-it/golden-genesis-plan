@@ -152,7 +152,7 @@ function Referrals() {
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-5">
+        <div className="grid md:grid-cols-2 gap-5">
           {/* Left: referral card + steps */}
           <div>
             <ReferralCard code={code} link={link} onCopy={copy} copied={copied} />
@@ -200,7 +200,7 @@ function Referrals() {
                 <motion.div
                   key={s.label}
                   variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-                  className={`rounded-2xl border p-5 relative overflow-hidden ${s.accent ? "border-[rgba(22,219,147,0.2)]" : isDark ? "border-[rgba(22,219,147,0.08)]" : "border-[rgba(22,219,147,0.1)]"} ${isDark ? "bg-[rgba(10,11,13,0.85)]" : "bg-white shadow-sm"}`}
+                  className={`rounded-2xl border p-4 relative overflow-hidden ${s.accent ? "border-[rgba(22,219,147,0.2)]" : isDark ? "border-[rgba(22,219,147,0.08)]" : "border-[rgba(22,219,147,0.1)]"} ${isDark ? "bg-[rgba(10,11,13,0.85)]" : "bg-white shadow-sm"}`}
                 >
                   {s.accent && (
                     <div className="absolute inset-0 pointer-events-none"
@@ -211,7 +211,7 @@ function Referrals() {
                     <div className="h-8 w-8 rounded-lg bg-[rgba(22,219,147,0.1)] grid place-items-center mb-3">
                       <s.icon className="h-4 w-4 text-[#16DB93]" />
                     </div>
-                    <div className="text-2xl font-bold tabular-nums gold-text">
+                    <div className="text-xl font-bold tabular-nums gold-text">
                       <AnimatedCount value={s.value as number} prefix={s.prefix} />
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
