@@ -1,10 +1,9 @@
 import type { ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { BottomNav } from "./BottomNav";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-import { TrendingUp } from "lucide-react";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -32,17 +31,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </div>
 
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className={`flex-1 ${user ? "pb-24 md:pb-0" : ""}`}>{children}</main>
       <Footer />
-
-      {user && (
-        <Link
-          to="/invest"
-          className="md:hidden fixed bottom-5 right-5 z-50 gold-gradient text-white rounded-full px-5 py-3 flex items-center gap-2 font-semibold shadow-lg animate-glow-pulse"
-        >
-          <TrendingUp className="h-4 w-4" /> Invest Now
-        </Link>
-      )}
+      {user && <BottomNav />}
     </div>
   );
 }

@@ -2,11 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, animate, useInView } from "framer-motion";
 import { SiteLayout } from "@/components/site/SiteLayout";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, Gift, Copy, Check } from "lucide-react";
+import { Users, Gift, Copy, Check, Share2, TrendingUp, Star } from "lucide-react";
+import { useTheme } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/_authenticated/referrals")({
   component: Referrals,
@@ -14,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/referrals")({
 
 type Ref = { id: string; referred_id: string; bonus_paid: boolean; bonus_amount: number; created_at: string };
 
-function AnimatedCount({ value }: { value: number }) {
+function AnimatedCount({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   const [display, setDisplay] = useState(0);
@@ -23,7 +22,77 @@ function AnimatedCount({ value }: { value: number }) {
     const c = animate(0, value, { duration: 1.5, ease: "easeOut", onUpdate: (v) => setDisplay(Math.floor(v)) });
     return c.stop;
   }, [inView, value]);
-  return <span ref={ref}>{display.toLocaleString()}</span>;
+  return <span ref={ref}>{prefix}{display.toLocaleString()}{suffix}</span>;
+}
+
+function ReferralCard({ code, link, onCopy, copied }: { code: string; link: string; onCopy: () => void; copied: boolean }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.55, delay: 0.2 }}
+      className="relative rounded-2xl overflow-hidden mb-6"
+      style={{
+        background: "linear-gradient(135deg, #0D1B3E 0%, #0a1428 45%, rgba(22,219,147,0.12) 100%)",
+        border: "1px solid rgba(22,219,147,0.22)",
+        boxShadow: "0 8px 40px rgba(22,219,147,0.08), 0 0 0 1px rgba(22,219,147,0.06)",
+      }}
+    >
+      {/* Glow orbs */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at 20% 110%, rgba(22,219,147,0.22) 0%, transparent 50%)" }} />
+      <div className="absolute inset-0 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at 90% -10%, rgba(22,219,147,0.1) 0%, transparent 50%)" }} />
+
+      {/* Decorative circles */}
+      <div className="absolute -right-10 -bottom-10 h-48 w-48 rounded-full opacity-[0.06]"
+        style={{ background: "radial-gradient(circle, #16DB93 0%, transparent 70%)" }} />
+
+      <div className="relative p-7">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.2em] text-[#16DB93]/70 mb-0.5">YieldEmpire Capital</div>
+            <div className="text-xs text-white/30">Referral Program</div>
+          </div>
+          <div className="flex items-center gap-2 bg-[rgba(22,219,147,0.1)] border border-[rgba(22,219,147,0.25)] rounded-full px-3 py-1">
+            <Star className="h-3 w-3 text-[#16DB93]" fill="#16DB93" />
+            <span className="text-xs font-semibold text-[#16DB93]">5% Bonus</span>
+          </div>
+        </div>
+
+        {/* Code */}
+        <div className="mb-7">
+          <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Your referral code</div>
+          <div className="text-3xl font-bold tracking-[0.18em] gold-text font-mono">{code || "———"}</div>
+        </div>
+
+        {/* Link */}
+        <div>
+          <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Shareable link</div>
+          <div className="flex gap-2 items-center">
+            <code className="flex-1 bg-black/40 border border-white/[0.06] rounded-xl px-4 py-2.5 text-xs text-white/50 font-mono truncate">
+              {link}
+            </code>
+            <motion.button
+              whileTap={{ scale: 0.92 }}
+              onClick={onCopy}
+              className="shrink-0 h-10 w-10 rounded-xl border grid place-items-center transition-all duration-200"
+              style={{
+                borderColor: copied ? "rgba(22,219,147,0.5)" : "rgba(255,255,255,0.1)",
+                background: copied ? "rgba(22,219,147,0.12)" : "transparent",
+              }}
+            >
+              {copied
+                ? <Check className="h-4 w-4 text-[#16DB93]" />
+                : <Copy className="h-4 w-4 text-white/40" />
+              }
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
 }
 
 function Referrals() {
@@ -31,6 +100,7 @@ function Referrals() {
   const [refs, setRefs] = useState<Ref[]>([]);
   const [earned, setEarned] = useState(0);
   const [copied, setCopied] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     (async () => {
@@ -56,123 +126,152 @@ function Referrals() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const isDark = theme === "dark";
+  const cardCls = `rounded-2xl border p-6 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
+
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-5xl px-4 py-12">
-        {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-8">
-          <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-2">Referral Program</div>
-          <h1 className="text-3xl font-bold mb-1">Refer &amp; earn</h1>
-          <p className="text-sm text-muted-foreground">Earn 5% bonus on every referred user's first approved deposit.</p>
-        </motion.div>
-
-        {/* Stat cards */}
+      <section className="mx-auto max-w-5xl px-4 py-10">
+        {/* Hero banner */}
         <motion.div
-          className="grid sm:grid-cols-3 gap-4 mb-8"
-          initial="hidden"
-          animate="show"
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+          className="relative rounded-3xl overflow-hidden mb-8 p-8"
+          style={{
+            background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
+            border: "1px solid rgba(22,219,147,0.12)",
+          }}
         >
-          {[
-            { icon: Users, label: "Total referrals",  value: refs.length,   prefix: "",  accent: false },
-            { icon: Gift,  label: "Bonus earned",      value: earned,        prefix: "$", accent: true  },
-            { icon: Copy,  label: "Your referral code", value: null,          prefix: "",  accent: false, code },
-          ].map((s) => (
-            <motion.div key={s.label} variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}>
-              <Card className={`surface-card border-[rgba(22,219,147,0.08)] relative overflow-hidden ${s.accent ? "animate-glow-pulse" : "hover:border-[rgba(22,219,147,0.2)]"} transition-colors duration-300`}>
-                {s.accent && <div className="absolute inset-x-0 top-0 h-[3px] gold-gradient" />}
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="text-xs uppercase tracking-wider text-muted-foreground">{s.label}</div>
-                    <div className="h-8 w-8 rounded-lg bg-[rgba(22,219,147,0.1)] grid place-items-center">
-                      <s.icon className="h-4 w-4 text-[#16DB93]" />
-                    </div>
-                  </div>
-                  {s.code ? (
-                    <div className="text-2xl font-bold tracking-widest gold-text">{s.code || "—"}</div>
-                  ) : (
-                    <div className="text-3xl font-bold tabular-nums gold-text">
-                      {s.prefix}<AnimatedCount value={s.value as number} />
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 85% 50%, rgba(22,219,147,0.1) 0%, transparent 55%)" }} />
+          <div className="relative">
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#16DB93] mb-2 font-semibold">Referral Program</div>
+            <h1 className="text-3xl font-bold mb-2 text-white">Refer &amp; earn</h1>
+            <p className="text-sm text-white/50 max-w-md">Invite friends and earn 5% of their first approved deposit — automatically credited to your wallet.</p>
+          </div>
         </motion.div>
 
-        {/* Referral link card */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
-          <Card className="surface-card border-[rgba(22,219,147,0.1)] mb-6">
-            <CardContent className="p-6">
-              <div className="text-sm font-semibold mb-3">Your referral link</div>
-              <div className="flex gap-2 items-center">
-                <code className="flex-1 bg-black/40 border border-[rgba(22,219,147,0.1)] rounded-lg p-3 text-xs break-all font-mono text-muted-foreground">
-                  {link}
-                </code>
-                <Button
-                  variant="outline"
-                  onClick={copy}
-                  className={`shrink-0 transition-colors duration-200 ${copied ? "border-[#16DB93] text-[#16DB93]" : "hover:border-[rgba(22,219,147,0.4)] hover:text-[#16DB93]"}`}
-                >
-                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-                </Button>
-              </div>
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
+          {/* Left: referral card + steps */}
+          <div>
+            <ReferralCard code={code} link={link} onCopy={copy} copied={copied} />
 
-              <div className="mt-4 grid sm:grid-cols-3 gap-3">
+            {/* How it works */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.35 }}
+              className={cardCls}
+            >
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-5">How it works</div>
+              <div className="grid sm:grid-cols-3 gap-3">
                 {[
-                  { step: "01", text: "Share your unique link" },
-                  { step: "02", text: "Friend deposits & invests" },
-                  { step: "03", text: "You earn 5% instantly" },
-                ].map(({ step, text }) => (
-                  <div key={step} className="flex items-center gap-3 bg-white/[0.02] rounded-lg px-4 py-3 border border-[rgba(22,219,147,0.06)]">
-                    <span className="text-xs font-bold text-[#16DB93]">{step}</span>
-                    <span className="text-xs text-muted-foreground">{text}</span>
+                  { icon: Share2,     step: "01", title: "Share your link",     desc: "Send to friends, social, anywhere" },
+                  { icon: Users,      step: "02", title: "They join & deposit", desc: "Friend registers and deposits" },
+                  { icon: TrendingUp, step: "03", title: "You earn 5%",         desc: "Bonus auto-credited instantly" },
+                ].map(({ icon: Icon, step, title, desc }) => (
+                  <div key={step} className="rounded-xl border border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)] p-4 text-center">
+                    <div className="h-9 w-9 rounded-xl bg-[rgba(22,219,147,0.08)] border border-[rgba(22,219,147,0.15)] grid place-items-center mx-auto mb-3">
+                      <Icon className="h-4 w-4 text-[#16DB93]" />
+                    </div>
+                    <div className="text-[10px] text-[#16DB93] font-bold mb-1">{step}</div>
+                    <div className="text-sm font-semibold mb-1">{title}</div>
+                    <div className="text-xs text-muted-foreground">{desc}</div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+            </motion.div>
+          </div>
 
-        {/* Referral activity */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.4 }}>
-          <Card className="surface-card border-[rgba(22,219,147,0.08)]">
-            <CardContent className="p-6">
-              <h2 className="text-lg font-bold mb-5">Referral activity</h2>
+          {/* Right: stats + activity */}
+          <div className="flex flex-col gap-5">
+            {/* Stats */}
+            <motion.div
+              className="grid grid-cols-2 gap-3"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
+            >
+              {[
+                { icon: Users, label: "Total referrals",  value: refs.length, prefix: "",  accent: false },
+                { icon: Gift,  label: "Total earned",     value: earned,       prefix: "$", accent: true  },
+              ].map((s) => (
+                <motion.div
+                  key={s.label}
+                  variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+                  className={`rounded-2xl border p-5 relative overflow-hidden ${s.accent ? "border-[rgba(22,219,147,0.2)]" : isDark ? "border-[rgba(22,219,147,0.08)]" : "border-[rgba(22,219,147,0.1)]"} ${isDark ? "bg-[rgba(10,11,13,0.85)]" : "bg-white shadow-sm"}`}
+                >
+                  {s.accent && (
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: "radial-gradient(ellipse at 100% 0%, rgba(22,219,147,0.08) 0%, transparent 60%)" }} />
+                  )}
+                  {s.accent && <div className="absolute inset-x-0 top-0 h-[2px] gold-gradient" />}
+                  <div className="relative">
+                    <div className="h-8 w-8 rounded-lg bg-[rgba(22,219,147,0.1)] grid place-items-center mb-3">
+                      <s.icon className="h-4 w-4 text-[#16DB93]" />
+                    </div>
+                    <div className="text-2xl font-bold tabular-nums gold-text">
+                      <AnimatedCount value={s.value as number} prefix={s.prefix} />
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Activity */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className={`${cardCls} flex-1`}
+            >
+              <h2 className="text-sm font-bold mb-5">Referral activity</h2>
               {refs.length === 0 ? (
-                <div className="py-12 text-center">
-                  <Users className="h-10 w-10 text-muted-foreground/20 mx-auto mb-3" />
-                  <div className="text-sm text-muted-foreground">No referrals yet — share your link to start earning.</div>
+                <div className="py-10 text-center">
+                  <div className="h-12 w-12 rounded-full bg-[rgba(22,219,147,0.06)] grid place-items-center mx-auto mb-3">
+                    <Users className="h-5 w-5 text-muted-foreground/30" />
+                  </div>
+                  <div className="text-sm text-muted-foreground">No referrals yet</div>
+                  <div className="text-xs text-muted-foreground/50 mt-1">Share your link to start earning</div>
                 </div>
               ) : (
-                <div className="text-sm divide-y divide-[rgba(22,219,147,0.05)]">
+                <div className="space-y-1 divide-y divide-[rgba(22,219,147,0.05)]">
                   {refs.map((r, i) => (
                     <motion.div
                       key={r.id}
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.05 }}
+                      transition={{ delay: 0.45 + i * 0.06 }}
                       className="py-3 flex justify-between items-center"
                     >
-                      <div>
-                        <div className="font-medium">Referred user</div>
-                        <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-[rgba(22,219,147,0.06)] border border-[rgba(22,219,147,0.12)] grid place-items-center">
+                          <Users className="h-3.5 w-3.5 text-[#16DB93]/60" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium">Referred user</div>
+                          <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
+                        </div>
                       </div>
-                      <div>
-                        {r.bonus_paid ? (
-                          <span className="text-[#16DB93] font-semibold">+${r.bonus_amount.toLocaleString()}</span>
-                        ) : (
-                          <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">Pending deposit</span>
-                        )}
-                      </div>
+                      {r.bonus_paid ? (
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-[#16DB93]">+${r.bonus_amount.toLocaleString()}</div>
+                          <div className="text-[10px] text-muted-foreground">Paid</div>
+                        </div>
+                      ) : (
+                        <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                          Pending
+                        </span>
+                      )}
                     </motion.div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-        </motion.div>
+            </motion.div>
+          </div>
+        </div>
       </section>
     </SiteLayout>
   );
