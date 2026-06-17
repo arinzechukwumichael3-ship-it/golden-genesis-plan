@@ -131,13 +131,13 @@ function Referrals() {
 
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
         {/* Hero banner */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          className="relative rounded-3xl overflow-hidden mb-8 p-8"
+          transition={{ duration: 0.45 }}
+          className="relative rounded-2xl overflow-hidden mb-6 p-5 sm:p-8"
           style={{
             background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
             border: "1px solid rgba(22,219,147,0.12)",
@@ -146,13 +146,13 @@ function Referrals() {
           <div className="absolute inset-0 pointer-events-none"
             style={{ background: "radial-gradient(ellipse at 85% 50%, rgba(22,219,147,0.1) 0%, transparent 55%)" }} />
           <div className="relative">
-            <div className="text-[10px] uppercase tracking-[0.22em] text-[#16DB93] mb-2 font-semibold">Referral Program</div>
-            <h1 className="text-3xl font-bold mb-2 text-white">Refer &amp; earn</h1>
-            <p className="text-sm text-white/50 max-w-md">Invite friends and earn 5% of their first approved deposit — automatically credited to your wallet.</p>
+            <div className="text-[10px] uppercase tracking-[0.22em] text-[#16DB93] mb-1.5 font-semibold">Referral Program</div>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-1.5 text-white">Refer &amp; earn</h1>
+            <p className="text-sm text-white/50 max-w-md">Invite friends and earn 5% of their first approved deposit — auto-credited to your wallet.</p>
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
+        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-5">
           {/* Left: referral card + steps */}
           <div>
             <ReferralCard code={code} link={link} onCopy={copy} copied={copied} />

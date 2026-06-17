@@ -42,12 +42,12 @@ export function Header() {
 
   const darkBg = scrolled
     ? "bg-[#0A0B0D]/95 border-b border-white/[0.08] shadow-sm shadow-black/30"
-    : "bg-[#0A0B0D]/80";
+    : "bg-[#0A0B0D]/80 border-b border-transparent";
   const lightBg = scrolled
     ? "bg-white/95 border-b border-black/[0.06] shadow-sm shadow-black/[0.04]"
-    : "bg-white/80";
+    : "bg-white/80 border-b border-transparent";
 
-  const headerCls = `sticky top-0 z-40 transition-all duration-300 backdrop-blur-xl ${theme === "dark" ? darkBg : lightBg}`;
+  const headerCls = `sticky top-0 z-40 transition-[background-color,border-color,box-shadow] duration-150 backdrop-blur-md ${theme === "dark" ? darkBg : lightBg}`;
 
   const linkCls = theme === "dark"
     ? "relative text-sm text-white/60 hover:text-white transition-colors duration-200 after:absolute after:bottom-[-3px] after:left-0 after:h-[2px] after:w-0 after:bg-[#16DB93] after:transition-all after:duration-250 hover:after:w-full"
