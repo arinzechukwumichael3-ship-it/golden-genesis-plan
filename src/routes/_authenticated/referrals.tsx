@@ -31,7 +31,7 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay: 0.2 }}
-      className="relative rounded-2xl overflow-hidden mb-6"
+      className="relative rounded-2xl overflow-hidden mb-4"
       style={{
         background: "linear-gradient(135deg, #0D1B3E 0%, #0a1428 45%, rgba(22,219,147,0.12) 100%)",
         border: "1px solid rgba(22,219,147,0.22)",
@@ -131,13 +131,13 @@ function Referrals() {
 
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-4xl px-4 py-6 sm:py-10">
+      <section className="mx-auto max-w-4xl px-4 py-4 sm:py-8">
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="relative rounded-2xl overflow-hidden mb-6 p-5 sm:p-8"
+          className="relative rounded-2xl overflow-hidden mb-4 p-4 sm:p-6"
           style={{
             background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
             border: "1px solid rgba(22,219,147,0.12)",
@@ -152,7 +152,7 @@ function Referrals() {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid md:grid-cols-2 gap-4">
           {/* Left: referral card + steps */}
           <div>
             <ReferralCard code={code} link={link} onCopy={copy} copied={copied} />
@@ -229,7 +229,7 @@ function Referrals() {
             >
               <h2 className="text-sm font-bold mb-5">Referral activity</h2>
               {refs.length === 0 ? (
-                <div className="py-10 text-center">
+                <div className="py-6 text-center">
                   <div className="h-12 w-12 rounded-full bg-[rgba(22,219,147,0.06)] grid place-items-center mx-auto mb-3">
                     <Users className="h-5 w-5 text-muted-foreground/30" />
                   </div>

@@ -227,7 +227,7 @@ function HeroVisual() {
   }, [mouseX, mouseY, rotX, rotY]);
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto h-[340px] md:h-[400px] flex items-center justify-center select-none pointer-events-none">
+    <div className="relative w-full max-w-2xl mx-auto h-[220px] sm:h-[320px] md:h-[400px] flex items-center justify-center select-none pointer-events-none">
       {/* Radial glow behind cards */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_70%_at_50%_50%,rgba(13,27,62,0.07),transparent_70%)]" />
 
@@ -330,7 +330,7 @@ function HeroVisual() {
       <motion.div
         animate={{ y: [0, -12, 0], rotate: [-1.5, 1.5, -1.5] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
-        className="absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
+        className="hidden sm:block absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
         style={theme === "dark" ? {
           background: "rgba(17,24,39,0.96)",
           border: "1px solid rgba(22,219,147,0.15)",
@@ -350,7 +350,7 @@ function HeroVisual() {
       <motion.div
         animate={{ y: [0, 12, 0], rotate: [1.5, -1.5, 1.5] }}
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="absolute bottom-4 left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
+        className="hidden sm:block absolute bottom-4 left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
         style={theme === "dark" ? {
           background: "rgba(17,24,39,0.96)",
           border: "1px solid rgba(22,219,147,0.15)",
@@ -387,7 +387,7 @@ function Home() {
     <SiteLayout>
 
       {/* ── HERO — with animated canvas background ── */}
-      <section ref={heroRef} className="relative overflow-hidden pt-12 pb-8 min-h-[90vh] flex flex-col justify-center">
+      <section ref={heroRef} className="relative overflow-hidden pt-4 pb-4 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
         {/* Animated canvas background */}
         <TradingChartBg isDark={theme === "dark"} />
 
@@ -406,26 +406,26 @@ function Home() {
 
           {/* Live badge */}
           <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-5 border border-[rgba(22,219,147,0.2)]">
+            className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-3 sm:mb-5 border border-[rgba(22,219,147,0.2)]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
             <span className="text-muted-foreground">{t("hero.badge")}</span>
           </motion.div>
 
           {/* Headline — word-by-word reveal */}
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.08] tracking-tight mb-5">
+          <h1 className="text-[1.9rem] sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.08] tracking-tight mb-3 sm:mb-5">
             <WordReveal text={t("hero.headline")} delay={0.3} />
             <br />
             <WordReveal text={t("hero.headlineAccent")} className="gold-text" delay={0.52} />
           </h1>
 
           <motion.p initial={{ opacity: 0, y: 20, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.7, delay: 0.45 }}
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            className="text-sm sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-4 sm:mb-8">
             {t("hero.subtext")}
           </motion.p>
 
           {/* Global stats row */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55 }}
-            className="flex items-center justify-center gap-4 sm:gap-8 md:gap-16 mb-8">
+            className="flex items-center justify-center gap-4 sm:gap-8 md:gap-16 mb-4 sm:mb-8">
             {[
               { value: 195, suffix: "+", label: t("stats.countries") },
               { value: 12400, suffix: "+", label: t("stats.investors") },
@@ -442,7 +442,7 @@ function Home() {
 
           {/* CTAs */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.65 }}
-            className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4 sm:mb-8">
             <MagneticButton>
               <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-8 animate-glow-pulse font-semibold text-base" asChild>
                 <Link to="/auth" search={{ mode: "register" }}>{t("hero.cta")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
@@ -457,7 +457,7 @@ function Home() {
 
           {/* Trust badges */}
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.75 }}
-            className="flex flex-wrap items-center justify-center gap-4">
+            className="hidden sm:flex flex-wrap items-center justify-center gap-4">
             <motion.div whileHover={{ scale: 1.03, y: -2 }} className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
               <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-[#16DB93] text-[#16DB93]" />)}</div>
               <div>
