@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { LogoMark } from "./LogoMark";
 
 export function Footer() {
   return (
@@ -7,9 +8,7 @@ export function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-14 grid md:grid-cols-4 gap-10 text-sm">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2.5 font-display font-bold mb-4">
-              <div className="h-8 w-8 rounded-xl gold-gradient grid place-items-center shadow-[0_0_16px_rgba(13,27,62,0.2)] border border-white/10">
-                <span className="text-white text-sm font-black">Y</span>
-              </div>
+              <LogoMark size={32} uid="footer" />
               <span className="text-white">Yield<span className="gold-text">Empire</span></span>
             </div>
             <p className="text-white/60 leading-relaxed text-xs">
