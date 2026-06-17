@@ -425,14 +425,14 @@ function Home() {
 
           {/* Global stats row */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55 }}
-            className="flex items-center justify-center gap-8 md:gap-16 mb-8">
+            className="flex items-center justify-center gap-4 sm:gap-8 md:gap-16 mb-8">
             {[
               { value: 195, suffix: "+", label: t("stats.countries") },
               { value: 12400, suffix: "+", label: t("stats.investors") },
               { value: null, display: "$1.2B+", label: t("stats.assets") },
             ].map((s) => (
               <div key={s.label} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold gold-text tabular-nums">
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold gold-text tabular-nums">
                   {s.value !== null ? <Counter to={s.value} suffix={s.suffix} /> : s.display}
                 </div>
                 <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
@@ -492,7 +492,7 @@ function Home() {
       </div>
 
       {/* ── "Trade with peace of mind" — feature image section ── */}
-      <section className="relative overflow-hidden py-28">
+      <section className="relative overflow-hidden py-14 sm:py-28">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_80%_50%,rgba(22,219,147,0.07),transparent_70%)]" />
         <div className="mx-auto max-w-7xl px-4 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div initial={{ opacity: 0, x: -55, filter: "blur(8px)" }} whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}>
@@ -552,7 +552,7 @@ function Home() {
       </section>
 
       {/* ── HOW IT WORKS — FundingPips numbered steps ── */}
-      <section className="py-24 border-t border-[rgba(22,219,147,0.06)]">
+      <section className="py-12 sm:py-24 border-t border-[rgba(22,219,147,0.06)]">
         <div className="mx-auto max-w-6xl px-4">
           <motion.div initial={{ opacity: 0, y: 24, filter: "blur(8px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}
             className="text-center mb-16">
@@ -560,7 +560,7 @@ function Home() {
             <p className="text-muted-foreground text-lg">{t("howItWorks.sub")}</p>
           </motion.div>
 
-          <div className="space-y-24">
+          <div className="space-y-12 sm:space-y-24">
             {/* Step 01 */}
             <motion.div
               initial={{ opacity: 0, x: -65, filter: "blur(10px)" }}
@@ -717,7 +717,7 @@ function Home() {
       </section>
 
       {/* ── PLANS OVERVIEW ── */}
-      <section className="py-24 border-t border-[rgba(22,219,147,0.06)] bg-[rgba(22,219,147,0.015)]">
+      <section className="py-16 sm:py-24 border-t border-[rgba(22,219,147,0.06)] bg-[rgba(22,219,147,0.015)]">
         <motion.div className="mx-auto max-w-7xl px-4" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <div className="text-center mb-14">
             <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-3">Investment Plans</div>
@@ -725,7 +725,7 @@ function Home() {
             <p className="text-muted-foreground max-w-xl mx-auto">{t("plans.sub")}</p>
           </div>
 
-          <motion.div className="grid lg:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
             {[
               {
                 name: "Basic Plan",
@@ -755,13 +755,13 @@ function Home() {
                   {plan.featured && (
                     <div className="gold-gradient text-white text-xs font-bold text-center py-2 tracking-wider">VIP SELECTION</div>
                   )}
-                  <div className="p-8">
-                    <div className="mb-6">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="mb-4 sm:mb-6">
                       <div className="text-xs text-muted-foreground mb-1">{plan.sub}</div>
-                      <h3 className="text-2xl font-bold">{plan.name}</h3>
+                      <h3 className="text-lg sm:text-2xl font-bold">{plan.name}</h3>
                     </div>
 
-                    <div className="rounded-2xl border border-[rgba(0,0,0,0.07)] bg-black/[0.02] p-4 mb-6">
+                    <div className="rounded-2xl border border-[rgba(0,0,0,0.07)] bg-black/[0.02] p-3 sm:p-4 mb-4 sm:mb-6">
                       <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Return structure</div>
                       <div className="space-y-2">
                         {plan.entries.map(([inv, earn]) => (
@@ -773,9 +773,9 @@ function Home() {
                       </div>
                     </div>
 
-                    <div className="space-y-2 mb-6">
+                    <div className="space-y-2 mb-4 sm:mb-6">
                       {plan.features.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div key={f} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                           <span className="h-4 w-4 rounded-full bg-[rgba(22,219,147,0.15)] grid place-items-center shrink-0">
                             <Check className="h-2.5 w-2.5 text-[#16DB93]" strokeWidth={3} />
                           </span>
@@ -796,7 +796,7 @@ function Home() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="py-24 border-t border-[rgba(22,219,147,0.06)]">
+      <section className="py-12 sm:py-24 border-t border-[rgba(22,219,147,0.06)]">
         <div className="mx-auto max-w-6xl px-4">
           <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
             className="text-center mb-14">
@@ -804,7 +804,7 @@ function Home() {
             <h2 className="text-4xl md:text-5xl font-bold">Trusted by thousands</h2>
           </motion.div>
 
-          <motion.div className="grid md:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
+          <motion.div className="grid sm:grid-cols-3 gap-4 sm:gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
             {[
               { name: "Alex Morrison",  country: "United States",  rating: 5, text: "Got my VIP payout in less than 72 hours. No drama, no delays. My capital has grown 8× in 4 months.",              avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
               { name: "Sarah Kim",      country: "United Kingdom", rating: 5, text: "Started with the Basic plan. The returns showed up exactly when they said. Now I'm on Premium BTC.",         avatar: "https://randomuser.me/api/portraits/women/44.jpg" },
@@ -814,7 +814,7 @@ function Home() {
                 <motion.div
                   whileHover={{ scale: 1.02, y: -6, rotateY: 2 }}
                   transition={{ duration: 0.22 }}
-                  className="surface-card rounded-3xl p-7 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.22)] transition-colors duration-300 h-full flex flex-col"
+                  className="surface-card rounded-3xl p-4 sm:p-7 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.22)] transition-colors duration-300 h-full flex flex-col"
                   style={{ transformStyle: "preserve-3d", perspective: "800px" }}
                 >
                   <div className="flex gap-0.5 mb-4">
@@ -844,7 +844,7 @@ function Home() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-24 border-t border-[rgba(22,219,147,0.06)] relative overflow-hidden">
+      <section className="py-12 sm:py-24 border-t border-[rgba(22,219,147,0.06)] relative overflow-hidden">
         <div className="absolute inset-0 gradient-mesh-bg opacity-40" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(22,219,147,0.12),transparent_70%)]" />
 
