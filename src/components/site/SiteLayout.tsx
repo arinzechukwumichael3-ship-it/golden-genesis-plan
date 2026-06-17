@@ -5,7 +5,7 @@ import { BottomNav } from "./BottomNav";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 
-const WHATSAPP_NUMBER = "2348012345678"; // Update with real support number
+const WHATSAPP_NUMBER = "9122646692";
 const WHATSAPP_MSG = encodeURIComponent("Hello YieldEmpire Support, I need help with my account.");
 
 export function SiteLayout({ children }: { children: ReactNode }) {
