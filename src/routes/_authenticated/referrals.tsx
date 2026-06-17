@@ -48,9 +48,9 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
       <div className="absolute -right-10 -bottom-10 h-48 w-48 rounded-full opacity-[0.06]"
         style={{ background: "radial-gradient(circle, #16DB93 0%, transparent 70%)" }} />
 
-      <div className="relative p-7">
+      <div className="relative p-4 sm:p-7">
         {/* Header */}
-        <div className="flex items-start justify-between mb-8">
+        <div className="flex items-start justify-between mb-4 sm:mb-8">
           <div>
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#16DB93]/70 mb-0.5">YieldEmpire Capital</div>
             <div className="text-xs text-white/30">Referral Program</div>
@@ -62,9 +62,9 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
         </div>
 
         {/* Code */}
-        <div className="mb-7">
-          <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Your referral code</div>
-          <div className="text-3xl font-bold tracking-[0.18em] gold-text font-mono">{code || "———"}</div>
+        <div className="mb-4 sm:mb-7">
+          <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1.5">Your referral code</div>
+          <div className="text-2xl sm:text-3xl font-bold tracking-[0.16em] gold-text font-mono">{code || "———"}</div>
         </div>
 
         {/* Link */}
@@ -127,7 +127,7 @@ function Referrals() {
   };
 
   const isDark = theme === "dark";
-  const cardCls = `rounded-2xl border p-6 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
+  const cardCls = `rounded-2xl border p-4 sm:p-6 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
 
   return (
     <SiteLayout>
@@ -164,20 +164,20 @@ function Referrals() {
               transition={{ duration: 0.5, delay: 0.35 }}
               className={cardCls}
             >
-              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-5">How it works</div>
-              <div className="grid sm:grid-cols-3 gap-3">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4">How it works</div>
+              <div className="grid grid-cols-3 gap-2">
                 {[
-                  { icon: Share2,     step: "01", title: "Share your link",     desc: "Send to friends, social, anywhere" },
-                  { icon: Users,      step: "02", title: "They join & deposit", desc: "Friend registers and deposits" },
-                  { icon: TrendingUp, step: "03", title: "You earn 5%",         desc: "Bonus auto-credited instantly" },
+                  { icon: Share2,     step: "01", title: "Share link",    desc: "Send to friends" },
+                  { icon: Users,      step: "02", title: "They deposit",  desc: "Join & deposit" },
+                  { icon: TrendingUp, step: "03", title: "Earn 5%",       desc: "Auto-credited" },
                 ].map(({ icon: Icon, step, title, desc }) => (
-                  <div key={step} className="rounded-xl border border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)] p-4 text-center">
-                    <div className="h-9 w-9 rounded-xl bg-[rgba(22,219,147,0.08)] border border-[rgba(22,219,147,0.15)] grid place-items-center mx-auto mb-3">
-                      <Icon className="h-4 w-4 text-[#16DB93]" />
+                  <div key={step} className="rounded-xl border border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)] p-2.5 text-center">
+                    <div className="h-7 w-7 rounded-lg bg-[rgba(22,219,147,0.08)] border border-[rgba(22,219,147,0.15)] grid place-items-center mx-auto mb-2">
+                      <Icon className="h-3.5 w-3.5 text-[#16DB93]" />
                     </div>
-                    <div className="text-[10px] text-[#16DB93] font-bold mb-1">{step}</div>
-                    <div className="text-sm font-semibold mb-1">{title}</div>
-                    <div className="text-xs text-muted-foreground">{desc}</div>
+                    <div className="text-[10px] text-[#16DB93] font-bold mb-0.5">{step}</div>
+                    <div className="text-xs font-semibold leading-tight mb-0.5">{title}</div>
+                    <div className="text-[10px] text-muted-foreground leading-tight">{desc}</div>
                   </div>
                 ))}
               </div>
