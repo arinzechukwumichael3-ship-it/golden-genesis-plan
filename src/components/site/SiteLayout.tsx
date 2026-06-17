@@ -38,16 +38,16 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <Footer />
       {user && <BottomNav />}
 
-      {/* WhatsApp support button — positions above BottomNav on mobile */}
+      {/* WhatsApp support button — left side on mobile to avoid covering right-side content */}
       <a
         href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
-        className={`fixed right-4 z-50 flex items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 active:scale-95 ${user ? "bottom-28 md:bottom-6" : "bottom-6"}`}
+        className={`fixed z-50 flex items-center justify-center rounded-full transition-transform duration-200 hover:scale-110 active:scale-95 left-4 md:left-auto md:right-4 ${user ? "bottom-28 md:bottom-6" : "bottom-6"}`}
         style={{
-          width: 52,
-          height: 52,
+          width: 48,
+          height: 48,
           background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
           boxShadow: "0 4px 20px rgba(37,211,102,0.45)",
         }}
