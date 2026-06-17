@@ -41,7 +41,7 @@ function AdminW() {
               <td>
                 {d.status === "pending" && (
                   <div className="flex gap-1">
-                    <Button size="sm" className="gold-gradient text-black h-7" onClick={() => action(d.id, "approve")}>Approve</Button>
+                    <Button size="sm" className="gold-gradient text-white h-7" onClick={() => action(d.id, "approve")}>Approve</Button>
                     <Button size="sm" variant="outline" className="h-7" onClick={() => action(d.id, "reject")}>Reject</Button>
                   </div>
                 )}

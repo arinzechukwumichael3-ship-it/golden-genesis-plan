@@ -33,7 +33,7 @@ function AdminN() {
       <form onSubmit={send} className="space-y-4">
         <div><Label>Title</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} required maxLength={120} /></div>
         <div><Label>Message</Label><Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} maxLength={500} /></div>
-        <Button disabled={loading} type="submit" className="gold-gradient text-black w-full">{loading ? "Sending..." : "Send to all users"}</Button>
+        <Button disabled={loading} type="submit" className="gold-gradient text-white w-full">{loading ? "Sending..." : "Send to all users"}</Button>
       </form>
     </CardContent></Card>
   );

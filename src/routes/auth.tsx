@@ -114,7 +114,7 @@ function Auth() {
                       <Label>Password</Label>
                       <Input name="password" type="password" required minLength={6} className="focus-visible:ring-[#16DB93] focus-visible:border-[#16DB93]/50" />
                     </div>
-                    <Button disabled={loading} type="submit" className="w-full gold-gradient text-black hover:opacity-90">
+                    <Button disabled={loading} type="submit" className="w-full gold-gradient text-white hover:opacity-90">
                       {loading ? "Signing in..." : "Sign in"}
                     </Button>
                   </form>
@@ -138,7 +138,7 @@ function Auth() {
                       <Label>Referral code (optional)</Label>
                       <Input name="ref" defaultValue={ref} placeholder="e.g. ABC12345" className="focus-visible:ring-[#16DB93] focus-visible:border-[#16DB93]/50" />
                     </div>
-                    <Button disabled={loading} type="submit" className="w-full gold-gradient text-black hover:opacity-90">
+                    <Button disabled={loading} type="submit" className="w-full gold-gradient text-white hover:opacity-90">
                       {loading ? "Creating..." : "Create account"}
                     </Button>
                   </form>

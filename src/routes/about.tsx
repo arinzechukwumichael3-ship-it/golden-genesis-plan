@@ -88,7 +88,7 @@ function About() {
               <motion.div whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(22,219,147,0.12)" }} transition={{ duration: 0.2 }}>
                 <Card className="surface-card border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.25)] transition-colors duration-300 text-center">
                   <CardContent className="p-6">
-                    <div className="h-20 w-20 mx-auto rounded-full gold-gradient grid place-items-center text-black text-2xl font-bold mb-4">{m.b}</div>
+                    <div className="h-20 w-20 mx-auto rounded-full gold-gradient grid place-items-center text-white text-2xl font-bold mb-4">{m.b}</div>
                     <div className="font-bold">{m.n}</div>
                     <div className="text-sm text-muted-foreground">{m.r}</div>
                   </CardContent>

@@ -205,7 +205,7 @@ function FAQ() {
             few hours.
           </p>
           <Button
-            className="gold-gradient text-black font-semibold px-8 py-3 animate-glow-pulse"
+            className="gold-gradient text-white font-semibold px-8 py-3 animate-glow-pulse"
             asChild
           >
             <Link to="/contact">Contact Us</Link>

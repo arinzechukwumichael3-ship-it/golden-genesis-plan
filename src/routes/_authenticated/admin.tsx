@@ -27,7 +27,7 @@ function AdminLayout() {
             { to: "/admin/referrals", label: "Referrals" },
             { to: "/admin/notifications", label: "Notify" },
           ].map((l) => (
-            <Link key={l.to} to={l.to} activeOptions={{ exact: true }} activeProps={{ className: "gold-gradient text-black" }}
+            <Link key={l.to} to={l.to} activeOptions={{ exact: true }} activeProps={{ className: "gold-gradient text-white" }}
               className="px-3 py-1.5 rounded-md text-sm border border-white/10 hover:border-[rgba(22,219,147,0.4)] hover:text-[#16DB93] transition-colors duration-200">{l.label}</Link>
           ))}
         </div>

@@ -192,7 +192,7 @@ function Withdraw() {
                   <Button
                     disabled={loading || amount <= 0 || amount > balance}
                     type="submit"
-                    className="w-full gold-gradient text-black hover:opacity-90 h-11 font-semibold"
+                    className="w-full gold-gradient text-white hover:opacity-90 h-11 font-semibold"
                   >
                     {loading ? "Submitting…" : "Request withdrawal"}
                   </Button>

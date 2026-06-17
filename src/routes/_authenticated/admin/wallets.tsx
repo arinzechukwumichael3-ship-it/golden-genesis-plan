@@ -24,7 +24,7 @@ function AdminWallets() {
         <Card key={w.coin} className="surface-card border-white/5"><CardContent className="p-4 flex gap-3 items-end">
           <div className="w-16 font-bold text-[var(--gold)]">{w.coin}</div>
           <div className="flex-1"><Input value={w.address} onChange={(e) => { const v = [...rows]; v[idx] = { ...w, address: e.target.value }; setRows(v); }} /></div>
-          <Button onClick={() => save(w)} className="gold-gradient text-black">Save</Button>
+          <Button onClick={() => save(w)} className="gold-gradient text-white">Save</Button>
         </CardContent></Card>
       ))}
     </div>

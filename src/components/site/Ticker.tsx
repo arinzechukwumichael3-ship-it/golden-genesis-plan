@@ -37,12 +37,12 @@ export function Ticker() {
 
   const items = [...quotes, ...quotes];
   return (
-    <div className="border-b border-white/5 bg-black/60 backdrop-blur overflow-hidden">
+    <div className="bg-[#0D1B3E] border-b border-white/5 overflow-hidden">
       <div className="ticker-track flex whitespace-nowrap py-2 gap-10 text-xs">
         {items.map((q, i) => (
           <span key={i} className="inline-flex items-center gap-2 px-3">
             <span className="font-semibold text-[var(--gold)]">{q.symbol}</span>
-            <span className="tabular-nums">${q.price.toLocaleString(undefined, { maximumFractionDigits: q.price < 5 ? 4 : 2 })}</span>
+            <span className="tabular-nums text-white/80">${q.price.toLocaleString(undefined, { maximumFractionDigits: q.price < 5 ? 4 : 2 })}</span>
             <span className={q.change >= 0 ? "text-emerald-400" : "text-red-400"}>
               {q.change >= 0 ? "▲" : "▼"} {Math.abs(q.change).toFixed(2)}%
             </span>
