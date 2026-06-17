@@ -109,6 +109,7 @@
 }
 
 @layer base {
+  html { overflow-x: hidden; }
   html, body { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); transition: background 0.35s ease, color 0.35s ease; }
   * { border-color: var(--color-border); }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
