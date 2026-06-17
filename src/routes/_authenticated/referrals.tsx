@@ -131,15 +131,15 @@ function Referrals() {
 
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-4xl px-4 py-4 sm:py-8">
+      <section className="w-full mx-auto max-w-4xl px-4 py-4 sm:py-8">
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45 }}
-          className="relative rounded-2xl overflow-hidden mb-4 p-4 sm:p-6"
+          className="relative rounded-2xl overflow-hidden mb-4 p-4 sm:p-6 w-full"
           style={{
-            background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
+            background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, #0a1428 100%)",
             border: "1px solid rgba(22,219,147,0.12)",
           }}
         >
