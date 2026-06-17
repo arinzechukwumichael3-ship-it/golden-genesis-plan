@@ -112,7 +112,7 @@ function Dashboard() {
           transition={{ duration: 0.5, delay: 0.35 }}
           className="flex flex-wrap gap-3 mb-10"
         >
-          <Button className="gold-gradient text-black hover:opacity-90 animate-glow-pulse" asChild>
+          <Button className="gold-gradient text-white hover:opacity-90 animate-glow-pulse" asChild>
             <Link to="/deposit"><ArrowDownToLine className="h-4 w-4 mr-2" />Deposit</Link>
           </Button>
           <Button variant="outline" className="hover:border-[rgba(22,219,147,0.4)] hover:text-[#16DB93] transition-colors" asChild>

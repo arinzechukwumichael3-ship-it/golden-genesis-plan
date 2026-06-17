@@ -130,7 +130,7 @@ function PlanCard({ plan }: { plan: Plan }) {
     <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.22 }} className="h-full">
       <Card className={`surface-card border-[rgba(22,219,147,0.1)] relative overflow-hidden h-full transition-colors duration-300 ${plan.featured ? "animate-glow-pulse" : "hover:border-[rgba(22,219,147,0.28)]"}`}>
         {plan.featured && (
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-white text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap">
             VIP SELECTION
           </div>
         )}
@@ -147,13 +147,13 @@ function PlanCard({ plan }: { plan: Plan }) {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-[rgba(22,219,147,0.1)] bg-white/[0.02] p-5 mb-6">
+          <div className="rounded-2xl border border-[rgba(0,0,0,0.07)] bg-black/[0.02] p-5 mb-6">
             <div className="text-xs text-muted-foreground mb-3 uppercase tracking-wider">Return structure</div>
             <div className="space-y-2.5">
               {plan.entries.map((entry) => (
                 <div
                   key={`${entry.invest}-${entry.earn}`}
-                  className="flex items-center justify-between rounded-xl border border-white/[0.07] bg-black/40 px-4 py-2.5 text-sm"
+                  className="flex items-center justify-between rounded-xl border border-[rgba(0,0,0,0.07)] bg-black/[0.03] px-4 py-2.5 text-sm"
                 >
                   <span className="text-muted-foreground">{entry.invest}</span>
                   <span className="font-semibold text-[#16DB93]">{entry.earn}</span>
@@ -168,7 +168,7 @@ function PlanCard({ plan }: { plan: Plan }) {
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Payout window: 72 hours after payment</p>
           </div>
 
-          <Button className="w-full gold-gradient text-black hover:opacity-95" asChild>
+          <Button className="w-full gold-gradient text-white hover:opacity-95" asChild>
             <Link to="/auth" search={{ mode: "register" }}>Start this plan</Link>
           </Button>
         </CardContent>

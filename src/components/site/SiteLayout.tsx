@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { Ticker } from "./Ticker";
 import { useAuth } from "@/hooks/use-auth";
 import { TrendingUp } from "lucide-react";
 
@@ -11,7 +10,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Announcement bar */}
-      <div className="bg-[#16DB93] text-black text-xs font-semibold py-2 overflow-hidden">
+      <div className="bg-[#0D1B3E] text-white text-xs font-semibold py-2 overflow-hidden">
         <div className="animate-marquee flex whitespace-nowrap gap-16">
           {[...Array(2)].map((_, i) => (
             <span key={i} className="flex gap-16 shrink-0">
@@ -29,7 +28,6 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         </div>
       </div>
 
-      <Ticker />
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />
@@ -37,7 +35,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       {user && (
         <Link
           to="/invest"
-          className="md:hidden fixed bottom-5 right-5 z-50 gold-gradient text-black rounded-full px-5 py-3 flex items-center gap-2 font-semibold shadow-lg animate-glow-pulse"
+          className="md:hidden fixed bottom-5 right-5 z-50 gold-gradient text-white rounded-full px-5 py-3 flex items-center gap-2 font-semibold shadow-lg animate-glow-pulse"
         >
           <TrendingUp className="h-4 w-4" /> Invest Now
         </Link>

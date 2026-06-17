@@ -287,7 +287,7 @@ function Contact() {
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className="gold-gradient text-black font-semibold animate-glow-pulse w-full py-3 text-base disabled:opacity-60"
+                    className="gold-gradient text-white font-semibold animate-glow-pulse w-full py-3 text-base disabled:opacity-60"
                   >
                     {submitting ? "Sending…" : "Send Message"}
                   </Button>

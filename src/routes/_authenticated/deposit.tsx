@@ -142,7 +142,7 @@ function Deposit() {
                       Send <span className="text-[#16DB93] font-medium">{coin}</span> only to this address
                     </div>
                     <div className="flex items-center justify-center gap-2">
-                      <code className="bg-black/50 border border-white/5 px-3 py-1.5 rounded-lg text-xs break-all font-mono text-muted-foreground max-w-[200px] truncate">
+                      <code className="bg-black/50 border border-white/10 text-white/80 px-3 py-1.5 rounded-lg text-xs break-all font-mono max-w-[200px] truncate">
                         {wallet.address}
                       </code>
                       <button
@@ -186,7 +186,7 @@ function Deposit() {
                   <Button
                     disabled={loading}
                     type="submit"
-                    className="w-full gold-gradient text-black hover:opacity-90 h-11 font-semibold animate-glow-pulse"
+                    className="w-full gold-gradient text-white hover:opacity-90 h-11 font-semibold animate-glow-pulse"
                   >
                     {loading ? "Submitting…" : "Submit deposit"}
                   </Button>

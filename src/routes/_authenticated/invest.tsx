@@ -221,7 +221,7 @@ function Invest() {
 
                   <Button
                     size="sm"
-                    className={`w-full mt-4 ${isActive ? "gold-gradient text-black" : "border border-[rgba(22,219,147,0.2)] hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93]"} transition-colors`}
+                    className={`w-full mt-4 ${isActive ? "gold-gradient text-white" : "border border-[rgba(22,219,147,0.2)] hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93]"} transition-colors`}
                     variant={isActive ? "default" : "outline"}
                   >
                     {isActive ? "Selected" : "Select plan"}
@@ -279,7 +279,7 @@ function Invest() {
                     <button
                       key={d}
                       onClick={() => setDuration(d)}
-                      className={`py-3 rounded-md border text-sm transition-colors duration-200 ${duration === d ? "gold-gradient text-black border-transparent font-semibold" : "border-white/10 hover:border-[rgba(22,219,147,0.3)] hover:text-[#16DB93]"}`}
+                      className={`py-3 rounded-md border text-sm transition-colors duration-200 ${duration === d ? "gold-gradient text-white border-transparent font-semibold" : "border-[rgba(0,0,0,0.12)] text-muted-foreground hover:border-[rgba(22,219,147,0.3)] hover:text-[#16DB93]"}`}
                     >
                       {d}d
                     </button>
@@ -320,7 +320,7 @@ function Invest() {
               <Button
                 onClick={submit}
                 disabled={loading || !plan}
-                className="w-full gold-gradient text-black hover:opacity-90 h-12 text-base font-semibold animate-glow-pulse"
+                className="w-full gold-gradient text-white hover:opacity-90 h-12 text-base font-semibold animate-glow-pulse"
               >
                 {loading ? "Processing…" : "Confirm investment"}
               </Button>

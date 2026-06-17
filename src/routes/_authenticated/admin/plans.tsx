@@ -36,7 +36,7 @@ function AdminPlans() {
             <input type="checkbox" checked={p.active} onChange={(e) => { const v = [...rows]; v[idx] = { ...p, active: e.target.checked }; setRows(v); }} />
             Active
           </label>
-          <Button onClick={() => save(p)} className="gold-gradient text-black w-full">Save</Button>
+          <Button onClick={() => save(p)} className="gold-gradient text-white w-full">Save</Button>
         </CardContent></Card>
       ))}
     </div>
