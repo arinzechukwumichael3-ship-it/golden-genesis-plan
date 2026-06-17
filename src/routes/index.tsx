@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useInView, animate, useMotionValue, useSpring } from "framer-motion";
+import { motion, useInView, animate, useMotionValue, useSpring, useScroll, useTransform } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Shield, TrendingUp, Wallet, Zap, Users, Lock, ArrowRight, Star, Check, Clock, BarChart3 } from "lucide-react";
+import { useLanguage } from "@/contexts/language-context";
+import { useTheme } from "@/hooks/use-theme";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -14,6 +16,112 @@ export const Route = createFileRoute("/")({
   }),
   component: Home,
 });
+
+/* ── Animated trading chart canvas background ── */
+function TradingChartBg() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    let raf: number;
+    let t = 0;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const W = () => canvas.offsetWidth;
+    const H = () => canvas.offsetHeight;
+
+    // Particles
+    const particles = Array.from({ length: 50 }, () => ({
+      x: Math.random() * W(), y: Math.random() * H(),
+      vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 1.5 + 0.5,
+    }));
+
+    const draw = () => {
+      t += 0.008;
+      ctx.clearRect(0, 0, W(), H());
+
+      // Grid lines
+      ctx.strokeStyle = "rgba(22,219,147,0.04)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W(); x += 60) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H()); ctx.stroke();
+      }
+      for (let y = 0; y < H(); y += 60) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W(), y); ctx.stroke();
+      }
+
+      // Animated chart lines (3 waves)
+      const waves = [
+        { amp: 40, freq: 0.012, phase: 0,    col: "rgba(22,219,147,0.18)", lw: 1.5 },
+        { amp: 25, freq: 0.018, phase: 1.5,  col: "rgba(13,27,62,0.12)",   lw: 1 },
+        { amp: 15, freq: 0.025, phase: 3,    col: "rgba(22,219,147,0.09)", lw: 0.8 },
+      ];
+      waves.forEach(({ amp, freq, phase, col, lw }) => {
+        ctx.beginPath();
+        ctx.strokeStyle = col;
+        ctx.lineWidth = lw;
+        for (let x = 0; x <= W(); x++) {
+          const y = H() * 0.55 + amp * Math.sin(x * freq + t + phase)
+            + amp * 0.4 * Math.sin(x * freq * 1.7 + t * 1.3 + phase);
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Fill under the first wave
+        if (lw === 1.5) {
+          ctx.lineTo(W(), H()); ctx.lineTo(0, H()); ctx.closePath();
+          const grad = ctx.createLinearGradient(0, H() * 0.3, 0, H());
+          grad.addColorStop(0, "rgba(22,219,147,0.06)");
+          grad.addColorStop(1, "rgba(22,219,147,0)");
+          ctx.fillStyle = grad;
+          ctx.fill();
+        }
+      });
+
+      // Candlestick bars (faint)
+      for (let i = 0; i < 24; i++) {
+        const x = (i / 24) * W() + 12;
+        const open = H() * 0.5 + Math.sin(i * 0.7 + t * 0.5) * 30;
+        const close = open + (Math.random() > 0.5 ? 1 : -1) * (Math.random() * 15 + 5);
+        const high = Math.min(open, close) - Math.random() * 8;
+        const low = Math.max(open, close) + Math.random() * 8;
+        const isUp = close < open;
+        const color = isUp ? "rgba(22,219,147,0.12)" : "rgba(239,68,68,0.08)";
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(x, high); ctx.lineTo(x, low); ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.fillRect(x - 4, Math.min(open, close), 8, Math.abs(close - open));
+      }
+
+      // Floating particles
+      particles.forEach((p) => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = W(); if (p.x > W()) p.x = 0;
+        if (p.y < 0) p.y = H(); if (p.y > H()) p.y = 0;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(22,219,147,0.25)";
+        ctx.fill();
+      });
+
+      raf = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
+  }, []);
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ opacity: 0.6 }} />;
+}
 
 /* ── Helpers ── */
 function Counter({ to, prefix = "", suffix = "", duration = 2 }: { to: number; prefix?: string; suffix?: string; duration?: number }) {
@@ -216,46 +324,59 @@ const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 
 /* ── Page ── */
 function Home() {
+  const { t } = useLanguage();
+  const { theme } = useTheme();
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+
   return (
     <SiteLayout>
 
-      {/* ── HERO — centered FundingPips-style ── */}
-      <section className="relative overflow-hidden pt-12 pb-8">
-        {/* Background layers */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(13,27,62,0.04),transparent_65%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_50%_110%,rgba(13,27,62,0.02),transparent_70%)]" />
+      {/* ── HERO — with animated canvas background ── */}
+      <section ref={heroRef} className="relative overflow-hidden pt-12 pb-8 min-h-[90vh] flex flex-col justify-center">
+        {/* Animated canvas background */}
+        <TradingChartBg />
 
-        <div className="relative mx-auto max-w-5xl px-4 text-center">
+        {/* Gradient overlays */}
+        <div className={`absolute inset-0 ${theme === "dark"
+          ? "bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(22,219,147,0.08),transparent_70%)]"
+          : "bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(13,27,62,0.04),transparent_65%)]"}`}
+        />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
+
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative mx-auto max-w-5xl px-4 text-center">
           {/* 3D Visual at top */}
-          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+          <motion.div initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <HeroVisual />
           </motion.div>
 
           {/* Live badge */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+          <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.2 }}
             className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-5 border border-[rgba(22,219,147,0.2)]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
-            <span className="text-muted-foreground">Live · Trusted by <span className="text-[#16DB93] font-semibold">12,400+</span> investors worldwide</span>
+            <span className="text-muted-foreground">{t("hero.badge")}</span>
           </motion.div>
 
           {/* Headline */}
-          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }}
+          <motion.h1 initial={{ opacity: 0, y: 32, filter: "blur(12px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.03] tracking-tight mb-5">
-            Turn your capital<br />into <span className="gold-text">crypto income.</span>
+            {t("hero.headline")}<br /><span className="gold-text">{t("hero.headlineAccent")}</span>
           </motion.h1>
 
-          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+          <motion.p initial={{ opacity: 0, y: 20, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.7, delay: 0.45 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Join the world's leading copy trading platform. Professional BTC &amp; USDT plans with verified 72-hour payouts.
+            {t("hero.subtext")}
           </motion.p>
 
           {/* Global stats row */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.55 }}
             className="flex items-center justify-center gap-8 md:gap-16 mb-8">
             {[
-              { value: 195, suffix: "+", label: "Countries" },
-              { value: 12400, suffix: "+", label: "Investors" },
-              { value: null, display: "$1.2B+", label: "Assets Managed" },
+              { value: 195, suffix: "+", label: t("stats.countries") },
+              { value: 12400, suffix: "+", label: t("stats.investors") },
+              { value: null, display: "$1.2B+", label: t("stats.assets") },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-2xl md:text-3xl font-bold gold-text tabular-nums">
@@ -267,35 +388,39 @@ function Home() {
           </motion.div>
 
           {/* CTAs */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.65 }}
             className="flex flex-wrap items-center justify-center gap-3 mb-8">
-            <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-8 animate-glow-pulse font-semibold text-base" asChild>
-              <Link to="/auth" search={{ mode: "register" }}>Start Earning <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
-            <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
-              <Link to="/plans">View Plans</Link>
-            </Button>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-8 animate-glow-pulse font-semibold text-base" asChild>
+                <Link to="/auth" search={{ mode: "register" }}>{t("hero.cta")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+              <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 dark:border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
+                <Link to="/plans">{t("hero.ctaSecondary")}</Link>
+              </Button>
+            </motion.div>
           </motion.div>
 
           {/* Trust badges */}
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.75 }}
             className="flex flex-wrap items-center justify-center gap-4">
-            <div className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
+            <motion.div whileHover={{ scale: 1.03, y: -2 }} className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
               <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-[#16DB93] text-[#16DB93]" />)}</div>
               <div>
                 <div className="text-sm font-bold">Excellent</div>
                 <div className="text-[11px] text-muted-foreground">58,842 reviews · Trustpilot</div>
               </div>
-            </div>
-            <div className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.03, y: -2 }} className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
               <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />)}</div>
               <div>
                 <div className="text-sm font-bold">Excellent</div>
                 <div className="text-[11px] text-muted-foreground">4.8 rated · Google</div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── STATS MARQUEE ── */}
@@ -376,10 +501,10 @@ function Home() {
       {/* ── HOW IT WORKS — FundingPips numbered steps ── */}
       <section className="py-24 border-t border-[rgba(22,219,147,0.06)]">
         <div className="mx-auto max-w-6xl px-4">
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+          <motion.div initial={{ opacity: 0, y: 24, filter: "blur(8px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.7 }}
             className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-3">How it works</h2>
-            <p className="text-muted-foreground text-lg">No fluff, no fine print. Here's exactly how it works.</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-3">{t("howItWorks.title")}</h2>
+            <p className="text-muted-foreground text-lg">{t("howItWorks.sub")}</p>
           </motion.div>
 
           <div className="space-y-24">
@@ -543,8 +668,8 @@ function Home() {
         <motion.div className="mx-auto max-w-7xl px-4" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <div className="text-center mb-14">
             <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-3">Investment Plans</div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose your plan</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">Three tiers of professionally managed copy trading. All plans pay out within 72 hours.</p>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">{t("plans.title")}</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">{t("plans.sub")}</p>
           </div>
 
           <motion.div className="grid lg:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
@@ -607,7 +732,7 @@ function Home() {
                     </div>
 
                     <Button className="w-full gold-gradient text-white hover:opacity-95 font-semibold" asChild>
-                      <Link to="/auth" search={{ mode: "register" }}>Start this plan</Link>
+                      <Link to="/auth" search={{ mode: "register" }}>{t("plans.start")}</Link>
                     </Button>
                   </div>
                 </motion.div>
@@ -664,19 +789,21 @@ function Home() {
           />
         ))}
 
-        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+        <motion.div initial={{ opacity: 0, y: 24, filter: "blur(8px)" }} whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.8 }}
           className="relative text-center max-w-3xl mx-auto px-4">
           <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-4">Start Today</div>
           <h2 className="text-4xl md:text-6xl font-bold mb-5">
-            Ready to grow<br />your <span className="gold-text">wealth?</span>
+            {t("cta.title")}<br /><span className="gold-text">{t("cta.titleAccent")}</span>
           </h2>
-          <p className="text-muted-foreground text-lg mb-8">Join 12,400+ investors already earning on YieldEmpireCapital. No experience required.</p>
+          <p className="text-muted-foreground text-lg mb-8">{t("cta.sub")}</p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-10 animate-glow-pulse font-semibold text-base" asChild>
-              <Link to="/auth" search={{ mode: "register" }}>Get Started Free <ArrowRight className="ml-2 h-4 w-4" /></Link>
-            </Button>
-            <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
-              <Link to="/contact">Talk to us</Link>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+              <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-10 animate-glow-pulse font-semibold text-base" asChild>
+                <Link to="/auth" search={{ mode: "register" }}>{t("cta.button")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
+              </Button>
+            </motion.div>
+            <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 dark:border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
+              <Link to="/contact">{t("cta.secondary")}</Link>
             </Button>
           </div>
         </motion.div>

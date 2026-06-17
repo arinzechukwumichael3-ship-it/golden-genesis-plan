@@ -3,14 +3,17 @@ import { Link } from "@tanstack/react-router";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { useAuth } from "@/hooks/use-auth";
+import { useTheme } from "@/hooks/use-theme";
 import { TrendingUp } from "lucide-react";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
+  const { theme } = useTheme();
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Announcement bar */}
-      <div className="bg-[#0D1B3E] text-white text-xs font-semibold py-2 overflow-hidden">
+      <div className={`text-xs font-semibold py-2 overflow-hidden ${theme === "dark" ? "bg-[#16DB93] text-black" : "bg-[#0D1B3E] text-white"}`}>
         <div className="animate-marquee flex whitespace-nowrap gap-16">
           {[...Array(2)].map((_, i) => (
             <span key={i} className="flex gap-16 shrink-0">
