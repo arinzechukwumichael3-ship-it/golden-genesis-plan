@@ -1,16 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useInView, animate } from "framer-motion";
+import { motion, useInView, animate, useMotionValue, useSpring } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { Shield, TrendingUp, Wallet, Zap, Users, BarChart3, Lock, ArrowRight, Star, Check } from "lucide-react";
-import heroVideo from "@/assets/hero.mp4.asset.json";
+import { Shield, TrendingUp, Wallet, Zap, Users, Lock, ArrowRight, Star, Check, Clock, BarChart3 } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "YieldEmpireCapital — BTC/USDT Copy Trading" },
-      { name: "description", content: "Professional BTC and USDT copy trading plans with tiered 72-hour payouts." },
+      { name: "description", content: "Professional BTC and USDT copy trading with tiered 72-hour payouts. Join 12,400+ investors." },
     ],
   }),
   component: Home,
@@ -31,7 +30,8 @@ function Counter({ to, prefix = "", suffix = "", duration = 2 }: { to: number; p
 
 function PillCheck({ label }: { label: string }) {
   return (
-    <motion.div whileHover={{ x: 3 }} transition={{ duration: 0.15 }} className="flex items-center justify-between rounded-full border border-[rgba(22,219,147,0.14)] bg-white/[0.025] px-5 py-3 hover:border-[rgba(22,219,147,0.35)] hover:bg-white/[0.04] transition-colors duration-200 cursor-default">
+    <motion.div whileHover={{ x: 3 }} transition={{ duration: 0.15 }}
+      className="flex items-center justify-between rounded-full border border-[rgba(22,219,147,0.14)] bg-white/[0.025] px-5 py-3 hover:border-[rgba(22,219,147,0.35)] hover:bg-white/[0.04] transition-colors duration-200 cursor-default">
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="h-5 w-5 rounded-full bg-[#16DB93] grid place-items-center shrink-0 ml-4">
         <Check className="h-3 w-3 text-black" strokeWidth={3} />
@@ -40,19 +40,176 @@ function PillCheck({ label }: { label: string }) {
   );
 }
 
-function HeroBarChart() {
+function MiniBarChart({ bars, active }: { bars: number[]; active?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true });
   return (
-    <div ref={ref} className="flex items-end gap-1 h-14">
-      {[35, 52, 41, 68, 55, 82, 100].map((h, i) => (
+    <div ref={ref} className="flex items-end gap-0.5 h-10">
+      {bars.map((h, i) => (
         <motion.div key={i} className="flex-1 rounded-t-sm"
           initial={{ height: 0 }}
-          animate={inView ? { height: h * 0.56 } : { height: 0 }}
-          transition={{ delay: 0.4 + i * 0.08, duration: 0.55, ease: "easeOut" }}
-          style={{ background: i === 6 ? "#16DB93" : `rgba(22,219,147,${0.14 + i * 0.1})` }}
+          animate={inView ? { height: h * 0.4 } : { height: 0 }}
+          transition={{ delay: 0.2 + i * 0.06, duration: 0.45, ease: "easeOut" }}
+          style={{ background: (active && i === bars.length - 1) ? "#16DB93" : `rgba(22,219,147,${0.15 + i * (0.6 / bars.length)})` }}
         />
       ))}
+    </div>
+  );
+}
+
+/* ── 3D Hero Visual ── */
+function HeroVisual() {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotX = useSpring(useMotionValue(8), { stiffness: 50, damping: 20 });
+  const rotY = useSpring(useMotionValue(-12), { stiffness: 50, damping: 20 });
+
+  useEffect(() => {
+    const handleMove = (e: MouseEvent) => {
+      mouseX.set((e.clientX / window.innerWidth - 0.5) * 18);
+      mouseY.set((e.clientY / window.innerHeight - 0.5) * -10);
+      rotX.set((e.clientY / window.innerHeight - 0.5) * -10 + 8);
+      rotY.set((e.clientX / window.innerWidth - 0.5) * 18 - 12);
+    };
+    window.addEventListener("mousemove", handleMove);
+    return () => window.removeEventListener("mousemove", handleMove);
+  }, [mouseX, mouseY, rotX, rotY]);
+
+  return (
+    <div className="relative w-full max-w-2xl mx-auto h-[340px] md:h-[400px] flex items-center justify-center select-none pointer-events-none">
+      {/* Radial glow behind cards */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_70%_at_50%_50%,rgba(22,219,147,0.18),transparent_70%)]" />
+
+      {/* Abstract floating geometric shapes */}
+      <motion.div
+        animate={{ y: [0, -18, 0], rotate: [0, 8, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-4 left-8 md:left-20 w-16 h-16 rounded-2xl opacity-40"
+        style={{
+          background: "linear-gradient(135deg, rgba(22,219,147,0.4), rgba(22,219,147,0.1))",
+          border: "1px solid rgba(22,219,147,0.4)",
+          boxShadow: "0 8px 32px rgba(22,219,147,0.2)",
+          transform: "rotate(15deg)",
+        }}
+      />
+      <motion.div
+        animate={{ y: [0, 14, 0], rotate: [0, -10, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-8 right-6 md:right-20 w-12 h-12 opacity-30"
+        style={{
+          background: "linear-gradient(135deg, rgba(22,219,147,0.5), rgba(45,224,142,0.2))",
+          border: "1px solid rgba(22,219,147,0.3)",
+          clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+          boxShadow: "0 8px 24px rgba(22,219,147,0.2)",
+        }}
+      />
+      <motion.div
+        animate={{ y: [0, 10, 0], rotate: [0, 5, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute top-14 right-10 md:right-28 w-8 h-8 rounded-lg opacity-25"
+        style={{
+          background: "rgba(22,219,147,0.5)",
+          border: "1px solid rgba(22,219,147,0.4)",
+        }}
+      />
+
+      {/* Main 3D card */}
+      <motion.div
+        style={{ rotateX: rotX, rotateY: rotY }}
+        animate={{ y: [-10, 10, -10] }}
+        transition={{ y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" } }}
+        className="relative z-10 w-72 md:w-80 rounded-3xl overflow-hidden"
+        initial={{ opacity: 0, scale: 0.85, y: 30 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        {/* Card surface */}
+        <div style={{
+          background: "linear-gradient(145deg, rgba(22,219,147,0.14) 0%, rgba(10,11,13,0.9) 60%, rgba(22,219,147,0.06) 100%)",
+          border: "1px solid rgba(22,219,147,0.28)",
+          boxShadow: "0 50px 100px -20px rgba(0,0,0,0.95), 0 0 0 1px rgba(22,219,147,0.08), 0 0 80px -20px rgba(22,219,147,0.35)",
+          backdropFilter: "blur(24px)",
+        }}>
+          {/* Card sheen highlight */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent pointer-events-none" />
+          {/* Green top edge */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(22,219,147,0.7)] to-transparent" />
+
+          <div className="relative p-6">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-widest text-[#16DB93] mb-1">Portfolio Value</div>
+                <div className="text-2xl font-bold tabular-nums">$1,247,830</div>
+                <div className="text-xs text-emerald-400 mt-0.5">▲ +$3,842 today</div>
+              </div>
+              <div className="bg-[rgba(22,219,147,0.12)] border border-[rgba(22,219,147,0.25)] rounded-full px-2.5 py-1 text-[10px] text-[#16DB93] font-semibold whitespace-nowrap">
+                ● Live
+              </div>
+            </div>
+
+            <MiniBarChart bars={[35, 48, 38, 62, 52, 78, 100]} active />
+
+            <div className="mt-4 space-y-2">
+              {[
+                { coin: "BTC", amt: "0.421", val: "$28,420", pct: "+2.4%", color: "#F7931A" },
+                { coin: "ETH", amt: "3.18",  val: "$12,418", pct: "+1.8%", color: "#627EEA" },
+                { coin: "USDT", amt: "5,771", val: "$5,771",  pct: "stable", color: "#26A17B" },
+              ].map((r) => (
+                <div key={r.coin} className="flex items-center justify-between py-1.5 border-b border-[rgba(22,219,147,0.06)] last:border-0">
+                  <div className="flex items-center gap-2">
+                    <div className="h-6 w-6 rounded-full grid place-items-center text-black text-[9px] font-bold" style={{ background: r.color }}>
+                      {r.coin[0]}
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold">{r.coin}</div>
+                      <div className="text-[9px] text-muted-foreground">{r.amt}</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs font-semibold">{r.val}</div>
+                    <div className="text-[9px] text-[#16DB93]">{r.pct}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Satellite cards */}
+      <motion.div
+        animate={{ y: [0, -12, 0], rotate: [-1.5, 1.5, -1.5] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
+        className="absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
+        style={{
+          background: "rgba(10,11,13,0.85)",
+          border: "1px solid rgba(22,219,147,0.22)",
+          boxShadow: "0 20px 50px -10px rgba(0,0,0,0.8), 0 0 30px -10px rgba(22,219,147,0.25)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <div className="px-4 py-3">
+          <div className="text-[9px] text-muted-foreground uppercase tracking-wider mb-0.5">VIP Monthly ROI</div>
+          <div className="text-lg font-bold gold-text">+25%</div>
+        </div>
+      </motion.div>
+
+      <motion.div
+        animate={{ y: [0, 12, 0], rotate: [1.5, -1.5, 1.5] }}
+        transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        className="absolute bottom-4 left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
+        style={{
+          background: "rgba(10,11,13,0.85)",
+          border: "1px solid rgba(22,219,147,0.22)",
+          boxShadow: "0 20px 50px -10px rgba(0,0,0,0.8), 0 0 30px -10px rgba(22,219,147,0.25)",
+          backdropFilter: "blur(16px)",
+        }}
+      >
+        <div className="px-4 py-3">
+          <div className="text-[9px] text-muted-foreground uppercase tracking-wider mb-0.5">Payout window</div>
+          <div className="text-lg font-bold">72 hrs</div>
+        </div>
+      </motion.div>
     </div>
   );
 }
@@ -65,111 +222,87 @@ function Home() {
   return (
     <SiteLayout>
 
-      {/* ── HERO ── */}
-      <section className="relative min-h-[95vh] flex items-center overflow-hidden">
-        <video className="absolute inset-0 h-full w-full object-cover opacity-20" autoPlay loop muted playsInline preload="auto" src={heroVideo.url} />
-        <div className="absolute inset-0 gradient-mesh-bg" />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_55%_at_50%_-5%,rgba(22,219,147,0.16),transparent_60%)]" />
+      {/* ── HERO — centered FundingPips-style ── */}
+      <section className="relative overflow-hidden pt-12 pb-8">
+        {/* Background layers */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(22,219,147,0.13),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_40%_40%_at_50%_110%,rgba(22,219,147,0.06),transparent_70%)]" />
 
-        <div className="relative mx-auto max-w-7xl px-4 py-24 grid lg:grid-cols-2 gap-16 items-center">
-
-          {/* Left */}
-          <motion.div initial="hidden" animate="show" variants={stagger}>
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-8 border border-[rgba(22,219,147,0.22)]">
-              <span className="h-2 w-2 rounded-full bg-[#16DB93] animate-pulse" />
-              <span className="text-muted-foreground">Live · Trusted by <span className="text-[#16DB93] font-semibold">12,400+</span> investors</span>
-            </motion.div>
-
-            <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-bold leading-[1.05] mb-6">
-              Turn your capital<br />into <span className="gold-text">crypto income.</span>
-            </motion.h1>
-
-            <motion.p variants={fadeUp} className="text-lg text-muted-foreground max-w-lg mb-8">
-              Professional BTC and USDT copy trading plans with verified 72-hour payouts and tiered returns.
-            </motion.p>
-
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3 mb-8">
-              <Button size="lg" className="gold-gradient text-black hover:opacity-90 h-12 px-8 animate-glow-pulse font-semibold text-base" asChild>
-                <Link to="/auth" search={{ mode: "register" }}>Get Started <ArrowRight className="ml-2 h-4 w-4" /></Link>
-              </Button>
-              <Button size="lg" variant="outline" className="h-12 px-8 border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
-                <Link to="/plans">View Plans</Link>
-              </Button>
-            </motion.div>
-
-            {/* Trust badges */}
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
-              <div className="flex items-center gap-2.5 surface-card rounded-2xl px-4 py-2.5 border border-[rgba(22,219,147,0.08)]">
-                <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-[#16DB93] text-[#16DB93]" />)}</div>
-                <div><div className="text-xs font-bold">Excellent</div><div className="text-[10px] text-muted-foreground">12,000+ reviews · Trustpilot</div></div>
-              </div>
-              <div className="flex items-center gap-2.5 surface-card rounded-2xl px-4 py-2.5 border border-[rgba(22,219,147,0.08)]">
-                <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}</div>
-                <div><div className="text-xs font-bold">4.8 / 5</div><div className="text-[10px] text-muted-foreground">Google Reviews</div></div>
-              </div>
-            </motion.div>
+        <div className="relative mx-auto max-w-5xl px-4 text-center">
+          {/* 3D Visual at top */}
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+            <HeroVisual />
           </motion.div>
 
-          {/* Right — floating portfolio card */}
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.3 }} className="hidden lg:block relative">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_50%,rgba(22,219,147,0.1),transparent_70%)] blur-3xl" />
-            <motion.div animate={{ y: [-8, 8, -8] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }} className="relative surface-card rounded-3xl p-7 animate-glow-pulse">
-              <div className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Portfolio Overview</div>
-              <div className="text-4xl font-bold tabular-nums mb-0.5">$48,231.<span className="text-muted-foreground text-2xl">52</span></div>
-              <div className="text-sm text-emerald-400 mb-5">▲ +$1,842.20 (3.97%) today</div>
-              <HeroBarChart />
-              <div className="mt-5 space-y-2.5">
-                {[
-                  { c: "BTC", amt: "0.421 BTC", val: "$30,242", up: true },
-                  { c: "ETH", amt: "3.18 ETH",  val: "$12,218", up: true },
-                  { c: "USDT", amt: "5,771",      val: "$5,771",  up: false },
-                ].map((r) => (
-                  <div key={r.c} className="flex justify-between items-center py-2 border-b border-[rgba(22,219,147,0.06)] last:border-0">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full gold-gradient grid place-items-center text-black text-xs font-bold">{r.c[0]}</div>
-                      <div><div className="font-semibold text-sm">{r.c}</div><div className="text-xs text-muted-foreground">{r.amt}</div></div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-sm tabular-nums">{r.val}</div>
-                      <div className={`text-xs ${r.up ? "text-emerald-400" : "text-muted-foreground"}`}>{r.up ? "▲ 2.1%" : "stable"}</div>
-                    </div>
-                  </div>
-                ))}
+          {/* Live badge */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
+            className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-5 border border-[rgba(22,219,147,0.2)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
+            <span className="text-muted-foreground">Live · Trusted by <span className="text-[#16DB93] font-semibold">12,400+</span> investors worldwide</span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }}
+            className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.03] tracking-tight mb-5">
+            Turn your capital<br />into <span className="gold-text">crypto income.</span>
+          </motion.h1>
+
+          <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            Join the world's leading copy trading platform. Professional BTC &amp; USDT plans with verified 72-hour payouts.
+          </motion.p>
+
+          {/* Global stats row */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.5 }}
+            className="flex items-center justify-center gap-8 md:gap-16 mb-8">
+            {[
+              { value: 195, suffix: "+", label: "Countries" },
+              { value: 12400, suffix: "+", label: "Investors" },
+              { value: null, display: "$1.2B+", label: "Assets Managed" },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <div className="text-2xl md:text-3xl font-bold gold-text tabular-nums">
+                  {s.value !== null ? <Counter to={s.value} suffix={s.suffix} /> : s.display}
+                </div>
+                <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
               </div>
-            </motion.div>
-            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.2 }} className="absolute -top-4 -right-6 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.2)]">
-              <div className="text-[#16DB93] font-bold text-xl">+25%</div>
-              <div className="text-muted-foreground text-xs whitespace-nowrap">VIP Monthly ROI</div>
-            </motion.div>
-            <motion.div animate={{ y: [5, -5, 5] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }} className="absolute -bottom-4 -left-6 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.2)]">
-              <div className="text-white font-bold text-xl">72 hrs</div>
-              <div className="text-muted-foreground text-xs whitespace-nowrap">Guaranteed payout</div>
-            </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}
+            className="flex flex-wrap items-center justify-center gap-3 mb-8">
+            <Button size="lg" className="gold-gradient text-black hover:opacity-90 h-13 px-8 animate-glow-pulse font-semibold text-base" asChild>
+              <Link to="/auth" search={{ mode: "register" }}>Start Earning <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+            <Button size="lg" variant="outline" className="h-13 px-8 border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
+              <Link to="/plans">View Plans</Link>
+            </Button>
+          </motion.div>
+
+          {/* Trust badges */}
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}
+            className="flex flex-wrap items-center justify-center gap-4">
+            <div className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
+              <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-[#16DB93] text-[#16DB93]" />)}</div>
+              <div>
+                <div className="text-sm font-bold">Excellent</div>
+                <div className="text-[11px] text-muted-foreground">58,842 reviews · Trustpilot</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 surface-card rounded-2xl px-4 py-3 border border-[rgba(22,219,147,0.08)]">
+              <div className="flex gap-0.5">{[...Array(5)].map((_, i) => <Star key={i} className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />)}</div>
+              <div>
+                <div className="text-sm font-bold">Excellent</div>
+                <div className="text-[11px] text-muted-foreground">4.8 rated · Google</div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>
 
-      {/* ── GLOBAL STATS ── */}
-      <section className="border-y border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)]">
-        <motion.div className="mx-auto max-w-4xl px-4 py-12 grid grid-cols-3 gap-8 text-center" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {[
-            { animated: true, to: 195, suffix: "+", label: "Countries" },
-            { animated: true, to: 12400, suffix: "+", label: "Active Investors" },
-            { animated: false, value: "$1.2B+", label: "Assets Managed" },
-          ].map((s) => (
-            <motion.div key={s.label} variants={fadeUp}>
-              <div className="text-3xl md:text-4xl font-bold gold-text tabular-nums">
-                {s.animated ? <Counter to={s.to!} suffix={s.suffix} /> : s.value}
-              </div>
-              <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
       {/* ── STATS MARQUEE ── */}
-      <div className="border-b border-[rgba(22,219,147,0.06)] bg-[rgba(22,219,147,0.015)] overflow-hidden py-4">
+      <div className="border-y border-[rgba(22,219,147,0.06)] bg-[rgba(22,219,147,0.015)] overflow-hidden py-4">
         <div className="animate-marquee flex whitespace-nowrap gap-14 text-sm text-muted-foreground">
           {[...Array(2)].map((_, set) => (
             <span key={set} className="flex gap-14 shrink-0">
@@ -183,219 +316,375 @@ function Home() {
         </div>
       </div>
 
-      {/* ── HOW IT WORKS — FundingPips numbered step style ── */}
-      <section className="mx-auto max-w-5xl px-4 py-28">
-        <div className="text-center mb-20">
-          <div className="text-sm uppercase tracking-widest text-[#16DB93] mb-3">How it works</div>
-          <h2 className="text-4xl md:text-5xl font-bold">Start earning in 3 steps</h2>
-          <p className="text-muted-foreground mt-4 max-w-md mx-auto">No fluff, no fine print. Here's exactly how it works.</p>
-        </div>
-
-        <div className="space-y-20">
-          {/* 01 */}
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="grid md:grid-cols-2 gap-14 items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-4 text-sm text-muted-foreground">
-                <span className="font-mono">01</span><span>·</span><span>Account Setup</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-3">Open Your Account</h3>
-              <p className="text-muted-foreground mb-7 leading-relaxed">Register in minutes. Get verified and gain immediate access to our copy trading strategies.</p>
-              <div className="space-y-2.5">
-                {["Email verification","KYC approved in 24h","Instant trading access","Zero minimum wait period"].map(f => <PillCheck key={f} label={f} />)}
-              </div>
-            </div>
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="surface-card rounded-3xl p-10 text-center border border-[rgba(22,219,147,0.1)] hover:border-[rgba(22,219,147,0.25)] transition-colors">
-              <div className="h-20 w-20 mx-auto rounded-2xl gold-gradient grid place-items-center text-black mb-5 animate-glow-pulse">
-                <Users className="h-9 w-9" />
-              </div>
-              <div className="text-3xl font-bold mb-1"><Counter to={12400} suffix="+" /></div>
-              <div className="text-muted-foreground text-sm">Investors trust YieldEmpire</div>
-            </motion.div>
-          </motion.div>
-
-          <div className="h-px bg-gradient-to-r from-transparent via-[rgba(22,219,147,0.15)] to-transparent" />
-
-          {/* 02 */}
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="grid md:grid-cols-2 gap-14 items-center">
-            <div className="md:order-2">
-              <div className="flex items-center gap-3 mb-4 text-sm text-muted-foreground">
-                <span className="font-mono">02</span><span>·</span><span>Fund &amp; Earn</span>
-              </div>
-              <h3 className="text-3xl font-bold mb-3">Real Returns. Fast.</h3>
-              <p className="text-muted-foreground mb-7 leading-relaxed">Deposit BTC or USDT and join our copy trading service. Returns land in your wallet within 72 hours — guaranteed.</p>
-              <div className="space-y-2.5">
-                {["BTC & USDT accepted","72-hour payout window","Bank-grade cold storage","Zero hidden fees"].map(f => <PillCheck key={f} label={f} />)}
-              </div>
-            </div>
-            {/* 3D raised stat card */}
-            <div className="md:order-1">
-              <motion.div
-                animate={{ rotateX: [2, -2, 2], rotateY: [-3, 3, -3] }}
-                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-                style={{ perspective: 1000 }}
-                whileHover={{ scale: 1.03 }}
-              >
-                <div className="surface-card rounded-3xl p-10 text-center animate-glow-pulse" style={{ boxShadow: "0 40px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(22,219,147,0.12), 0 20px 50px -15px rgba(22,219,147,0.2)" }}>
-                  <div className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4">Total Assets Managed</div>
-                  <div className="text-6xl font-bold gold-text mb-3">$1.2B+</div>
-                  <div className="text-sm text-muted-foreground">Across all investment plans</div>
+      {/* ── "Trade with peace of mind" — feature image section ── */}
+      <section className="relative overflow-hidden py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_80%_50%,rgba(22,219,147,0.07),transparent_70%)]" />
+        <div className="mx-auto max-w-7xl px-4 grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+            <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-4">Our Philosophy</div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+              Trade with<br /><span className="gold-text">peace of mind.</span>
+            </h2>
+            <p className="text-muted-foreground text-lg mb-8 leading-relaxed">
+              No complicated processes. No hidden requirements. A clear path to earning real crypto returns — all with institutional-grade security.
+            </p>
+            <div className="space-y-3">
+              {["Flexible payout cycles — weekly or on maturity", "Zero reward denial policy", "Transparent return structure with no surprises", "Starting from just $500"].map(f => (
+                <div key={f} className="flex items-center gap-3">
+                  <span className="h-5 w-5 rounded-full bg-[#16DB93] grid place-items-center shrink-0">
+                    <Check className="h-3 w-3 text-black" strokeWidth={3} />
+                  </span>
+                  <span className="text-sm text-muted-foreground">{f}</span>
                 </div>
-              </motion.div>
+              ))}
             </div>
+            <Button className="mt-8 gold-gradient text-black hover:opacity-90" asChild>
+              <Link to="/plans">Explore plans <ArrowRight className="h-4 w-4 ml-2" /></Link>
+            </Button>
           </motion.div>
 
-          <div className="h-px bg-gradient-to-r from-transparent via-[rgba(22,219,147,0.15)] to-transparent" />
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.15 }}
+            className="grid grid-cols-2 gap-4"
+          >
+            {[
+              { icon: Shield,  title: "Bank-grade security",     desc: "Multi-sig wallets, cold storage, 2FA on every account." },
+              { icon: Clock,   title: "72-hour payouts",          desc: "Returns credited within 72 hours of investment maturity." },
+              { icon: Zap,     title: "Instant setup",            desc: "Open an account in minutes. Start earning today." },
+              { icon: Lock,    title: "SOC2 compliant",           desc: "Audited infrastructure you can trust with real capital." },
+            ].map((card, i) => (
+              <motion.div
+                key={card.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -4 }}
+                className="surface-card rounded-2xl p-5 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.25)] transition-colors duration-300"
+              >
+                <div className="h-9 w-9 rounded-xl bg-[rgba(22,219,147,0.1)] grid place-items-center mb-3">
+                  <card.icon className="h-4.5 w-4.5 text-[#16DB93]" />
+                </div>
+                <div className="font-semibold text-sm mb-1">{card.title}</div>
+                <div className="text-xs text-muted-foreground leading-relaxed">{card.desc}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
-          {/* 03 */}
-          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="grid md:grid-cols-2 gap-14 items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-4 text-sm text-muted-foreground">
-                <span className="font-mono">03</span><span>·</span><span>Scale Up</span>
+      {/* ── HOW IT WORKS — FundingPips numbered steps ── */}
+      <section className="py-24 border-t border-[rgba(22,219,147,0.06)]">
+        <div className="mx-auto max-w-6xl px-4">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-3">How it works</h2>
+            <p className="text-muted-foreground text-lg">No fluff, no fine print. Here's exactly how it works.</p>
+          </motion.div>
+
+          <div className="space-y-24">
+            {/* Step 01 */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="grid lg:grid-cols-2 gap-12 items-center"
+            >
+              <div>
+                <div className="text-[80px] font-bold leading-none gold-text opacity-25 mb-2 select-none">01</div>
+                <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-2">Account Setup</div>
+                <h3 className="text-3xl font-bold mb-4">Open Your Account</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">Register in minutes with just your email. Verify your identity and get instant access to all investment plans.</p>
+                <div className="space-y-2.5">
+                  {["Email verification in seconds", "KYC approval within 24 hours", "Instant platform access", "Dedicated onboarding support"].map(f => <PillCheck key={f} label={f} />)}
+                </div>
               </div>
-              <h3 className="text-3xl font-bold mb-3">Grow Your Portfolio</h3>
-              <p className="text-muted-foreground mb-7 leading-relaxed">Choose your plan. Scale from Basic to VIP with proven copy trading strategies and dedicated support.</p>
-              <div className="space-y-2.5">
-                {["3 plan tiers from $100","Up to 25% monthly ROI","Dedicated VIP manager","Custom scaling strategies"].map(f => <PillCheck key={f} label={f} />)}
-              </div>
-            </div>
-            {/* Animated bar chart */}
-            <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }} className="surface-card rounded-3xl p-8 border border-[rgba(22,219,147,0.1)] hover:border-[rgba(22,219,147,0.25)] transition-colors">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-6">Plan Growth Scale</div>
-              <div className="flex items-end gap-2.5" style={{ height: 140 }}>
-                {[
-                  { pct: 25, val: "$100" },
-                  { pct: 40, val: "$500" },
-                  { pct: 60, val: "$1K" },
-                  { pct: 78, val: "$5K" },
-                  { pct: 100, val: "$10K+" },
-                ].map((bar, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center">
-                    <motion.div className="w-full rounded-t-lg"
-                      initial={{ height: 0 }}
-                      whileInView={{ height: bar.pct * 1.4 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.12, duration: 0.8, ease: "easeOut" }}
-                      style={{ background: `rgba(22,219,147,${0.22 + i * 0.155})` }}
-                    />
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="surface-card rounded-3xl p-8 border border-[rgba(22,219,147,0.12)]"
+                style={{ boxShadow: "0 30px 60px -15px rgba(0,0,0,0.6), 0 0 0 1px rgba(22,219,147,0.08)" }}
+              >
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-12 w-12 rounded-2xl bg-[rgba(22,219,147,0.15)] grid place-items-center border border-[rgba(22,219,147,0.2)]">
+                    <Users className="h-6 w-6 text-[#16DB93]" />
+                  </div>
+                  <div>
+                    <div className="font-bold">New investor joined</div>
+                    <div className="text-xs text-muted-foreground">Just now · Verified ✓</div>
+                  </div>
+                </div>
+                {["Email confirmed", "Identity verified", "Account activated", "First investment placed"].map((step, i) => (
+                  <div key={step} className="flex items-center gap-3 py-2.5 border-b border-[rgba(22,219,147,0.05)] last:border-0">
+                    <span className="h-5 w-5 rounded-full bg-[#16DB93] grid place-items-center shrink-0">
+                      <Check className="h-3 w-3 text-black" strokeWidth={3} />
+                    </span>
+                    <span className="text-sm">{step}</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground">{i === 0 ? "instant" : i === 1 ? "24h" : i === 2 ? "immediate" : "ready"}</span>
                   </div>
                 ))}
+              </motion.div>
+            </motion.div>
+
+            {/* Step 02 */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="grid lg:grid-cols-2 gap-12 items-center"
+            >
+              <div className="lg:order-2">
+                <div className="text-[80px] font-bold leading-none gold-text opacity-25 mb-2 select-none">02</div>
+                <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-2">Fund Your Account</div>
+                <h3 className="text-3xl font-bold mb-4">Real Cash. Fast.</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">Deposit your chosen cryptocurrency. Already paid out $1.2B+ to investors. Keep up to 100% of your earnings.</p>
+                <div className="space-y-2.5">
+                  {["BTC and USDT accepted", "Instant portfolio credit on approval", "No minimum lock-in periods", "Withdrawals processed within 72 hours"].map(f => <PillCheck key={f} label={f} />)}
+                </div>
               </div>
-              <div className="flex mt-3 text-xs text-muted-foreground">
-                {["$100","$500","$1K","$5K","$10K+"].map((v) => <span key={v} className="flex-1 text-center">{v}</span>)}
-              </div>
-              <div className="flex mt-1 text-xs font-semibold text-[#16DB93]">
-                {["Basic","","Pro","","VIP"].map((v, i) => <span key={i} className="flex-1 text-center">{v}</span>)}
+              <div className="lg:order-1 flex justify-center">
+                {/* 3D raised stat card */}
+                <motion.div
+                  animate={{ rotateX: [8, 12, 8], rotateY: [-12, -8, -12] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  style={{ transformStyle: "preserve-3d", perspective: "1000px" }}
+                  whileHover={{ scale: 1.03 }}
+                  className="rounded-3xl overflow-hidden w-72"
+                >
+                  <div style={{
+                    background: "linear-gradient(145deg, rgba(22,219,147,0.18) 0%, rgba(10,11,13,0.95) 100%)",
+                    border: "1px solid rgba(22,219,147,0.25)",
+                    boxShadow: "0 50px 100px -20px rgba(0,0,0,0.95), 0 0 0 1px rgba(22,219,147,0.1), 0 0 80px -20px rgba(22,219,147,0.4)",
+                  }}>
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[rgba(22,219,147,0.6)] to-transparent" />
+                    <div className="p-10 text-center">
+                      <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Total paid out</div>
+                      <div className="text-6xl font-bold gold-text mb-2">$1.2B+</div>
+                      <div className="text-sm text-muted-foreground">rewarded to investors</div>
+                      <div className="mt-6 inline-flex items-center gap-2 bg-[rgba(22,219,147,0.1)] border border-[rgba(22,219,147,0.2)] rounded-full px-4 py-2 text-xs text-[#16DB93]">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
+                        Payouts running live
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               </div>
             </motion.div>
-          </motion.div>
+
+            {/* Step 03 */}
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="grid lg:grid-cols-2 gap-12 items-center"
+            >
+              <div>
+                <div className="text-[80px] font-bold leading-none gold-text opacity-25 mb-2 select-none">03</div>
+                <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-2">Scale Your Capital</div>
+                <h3 className="text-3xl font-bold mb-4">Choose a Plan &amp; Earn</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">Select Basic, VIP, or Premium. Scale your capital from hundreds to millions. Reinvest and compound your returns automatically.</p>
+                <div className="space-y-2.5">
+                  {["3 plan tiers for every capital level", "Returns in 72 hours after maturity", "Compound reinvestment available", "Scale to unlimited capital over time"].map(f => <PillCheck key={f} label={f} />)}
+                </div>
+              </div>
+
+              {/* Animated bar chart showing plan tiers */}
+              <motion.div
+                whileHover={{ y: -4 }}
+                className="surface-card rounded-3xl p-8 border border-[rgba(22,219,147,0.12)]"
+                style={{ boxShadow: "0 30px 60px -15px rgba(0,0,0,0.6)" }}
+              >
+                <div className="text-xs text-muted-foreground uppercase tracking-wider mb-6">Scale Prime Capital</div>
+                <div className="flex items-end gap-3 h-44 mb-4">
+                  {[
+                    { label: "Basic", height: 35, range: "$500→$1k" },
+                    { label: "Basic+", height: 48, range: "$800→$2.5k" },
+                    { label: "VIP", height: 65, range: "$2k→$10k" },
+                    { label: "VIP+", height: 80, range: "$5k→$50k" },
+                    { label: "Premium", height: 100, range: "$10k→$100k" },
+                  ].map((bar, i) => {
+                    const ref = useRef<HTMLDivElement>(null);
+                    const inView = useInView(ref, { once: true });
+                    return (
+                      <div key={bar.label} ref={ref} className="flex-1 flex flex-col items-center gap-2">
+                        <div className="text-[9px] text-muted-foreground text-center leading-tight">{bar.range}</div>
+                        <div className="w-full flex flex-col justify-end" style={{ height: "120px" }}>
+                          <motion.div
+                            className="w-full rounded-t-md"
+                            initial={{ height: 0 }}
+                            animate={inView ? { height: bar.height * 1.2 } : { height: 0 }}
+                            transition={{ delay: 0.3 + i * 0.12, duration: 0.6, ease: "easeOut" }}
+                            style={{
+                              background: i === 4
+                                ? "linear-gradient(180deg, #16DB93, #2DE08E)"
+                                : `rgba(22,219,147,${0.15 + i * 0.18})`,
+                            }}
+                          />
+                        </div>
+                        <div className="text-[9px] text-muted-foreground">{bar.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="flex justify-between text-[10px] text-muted-foreground border-t border-[rgba(22,219,147,0.06)] pt-3">
+                  <span>Starting at $500</span>
+                  <span className="text-[#16DB93]">Up to 10× returns</span>
+                </div>
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ── PLANS OVERVIEW ── */}
-      <section className="mx-auto max-w-7xl px-4 py-24">
-        <div className="text-center mb-14">
-          <div className="text-sm uppercase tracking-widest text-[#16DB93] mb-3">Investment plans</div>
-          <h2 className="text-4xl md:text-5xl font-bold">Plans built for every investor</h2>
-        </div>
-        <motion.div className="grid md:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {[
-            { n: "Basic", min: "$100",    roi: "8%",  f: ["Beginner-friendly","24/7 support","Daily payouts"] },
-            { n: "Pro",   min: "$1,000",  roi: "15%", f: ["Priority support","Advanced analytics","Higher returns"], featured: true },
-            { n: "VIP",   min: "$10,000", roi: "25%", f: ["Dedicated manager","Custom strategies","Maximum ROI"] },
-          ].map((p) => (
-            <motion.div key={p.n} variants={fadeUp}>
-              <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.2 }} className="h-full">
-                <div className={`surface-card rounded-2xl relative h-full transition-all duration-300 overflow-hidden ${p.featured ? "animate-glow-pulse border border-[rgba(22,219,147,0.3)]" : "border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.25)]"}`}>
-                  {p.featured && <div className="absolute -top-3 left-1/2 -translate-x-1/2 gold-gradient text-black text-xs font-bold px-4 py-1 rounded-full whitespace-nowrap z-10">MOST POPULAR</div>}
+      <section className="py-24 border-t border-[rgba(22,219,147,0.06)] bg-[rgba(22,219,147,0.015)]">
+        <motion.div className="mx-auto max-w-7xl px-4" initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+          <div className="text-center mb-14">
+            <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-3">Investment Plans</div>
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Choose your plan</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">Three tiers of professionally managed copy trading. All plans pay out within 72 hours.</p>
+          </div>
+
+          <motion.div className="grid lg:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
+            {[
+              {
+                name: "Basic Plan",
+                sub: "USDT copy trading",
+                featured: false,
+                entries: [["€500","€1,000"],["€600","€1,500"],["€700","€1,800"],["€800","€2,000"],["€900","€2,500"]],
+                features: ["72-hour payouts","5 tier levels","USDT deposits","Email support"],
+              },
+              {
+                name: "VIP Plan",
+                sub: "Elite USDT tiers",
+                featured: true,
+                entries: [["€1k","€5k"],["€2k","€10k"],["€5k","€50k"],["€10k","€100k"]],
+                features: ["Priority payouts","7 tier levels","Highest multipliers","Dedicated support"],
+              },
+              {
+                name: "Premium Plan",
+                sub: "BTC-only trading",
+                featured: false,
+                entries: [["1 BTC","3 BTC"],["2 BTC","6 BTC"],["3 BTC","9 BTC"],["5 BTC","15 BTC"]],
+                features: ["72-hour payouts","5 BTC tiers","3× multiplier","VIP account manager"],
+              },
+            ].map((plan) => (
+              <motion.div key={plan.name} variants={fadeUp}>
+                <motion.div whileHover={{ y: -8, transition: { duration: 0.22 } }}
+                  className={`surface-card rounded-3xl border h-full ${plan.featured ? "border-[rgba(22,219,147,0.35)] animate-glow-pulse" : "border-[rgba(22,219,147,0.1)] hover:border-[rgba(22,219,147,0.28)]"} transition-colors duration-300 overflow-hidden`}>
+                  {plan.featured && (
+                    <div className="gold-gradient text-black text-xs font-bold text-center py-2 tracking-wider">VIP SELECTION</div>
+                  )}
                   <div className="p-8">
-                    <h3 className="text-2xl font-bold mb-1">{p.n}</h3>
-                    <p className="text-sm text-muted-foreground mb-6">From {p.min}</p>
-                    <div className="flex items-baseline gap-1 mb-7">
-                      <span className="text-5xl font-bold gold-text">{p.roi}</span>
-                      <span className="text-muted-foreground text-sm">monthly ROI</span>
+                    <div className="mb-6">
+                      <div className="text-xs text-muted-foreground mb-1">{plan.sub}</div>
+                      <h3 className="text-2xl font-bold">{plan.name}</h3>
                     </div>
-                    <div className="space-y-2.5 mb-8">{p.f.map((x) => <PillCheck key={x} label={x} />)}</div>
-                    <Button className="w-full gold-gradient text-black hover:opacity-90 font-semibold" asChild>
-                      <Link to="/plans">Select plan</Link>
+
+                    <div className="rounded-2xl border border-[rgba(22,219,147,0.1)] bg-black/30 p-4 mb-6">
+                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Return structure</div>
+                      <div className="space-y-2">
+                        {plan.entries.map(([inv, earn]) => (
+                          <div key={inv} className="flex justify-between text-sm border border-white/5 rounded-lg px-3 py-2 bg-black/30">
+                            <span className="text-muted-foreground">{inv}</span>
+                            <span className="font-semibold text-[#16DB93]">{earn}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2 mb-6">
+                      {plan.features.map(f => (
+                        <div key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <span className="h-4 w-4 rounded-full bg-[rgba(22,219,147,0.15)] grid place-items-center shrink-0">
+                            <Check className="h-2.5 w-2.5 text-[#16DB93]" strokeWidth={3} />
+                          </span>
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button className="w-full gold-gradient text-black hover:opacity-95 font-semibold" asChild>
+                      <Link to="/auth" search={{ mode: "register" }}>Start this plan</Link>
                     </Button>
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
-      {/* ── WHY CHOOSE US ── */}
-      <section className="mx-auto max-w-7xl px-4 py-24">
-        <div className="text-center mb-14">
-          <div className="text-sm uppercase tracking-widest text-[#16DB93] mb-3">Why choose us</div>
-          <h2 className="text-4xl md:text-5xl font-bold">A platform you can trust</h2>
-        </div>
-        <motion.div className="grid md:grid-cols-4 gap-5" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {[
-            { icon: Shield,    t: "Bank-grade security", d: "Cold storage, 2FA, SOC2 compliant infrastructure." },
-            { icon: Zap,       t: "Instant withdrawals",  d: "Most withdrawals processed within minutes, not days." },
-            { icon: BarChart3, t: "Transparent returns",  d: "Real-time dashboard. See every payout, every cent." },
-            { icon: Lock,      t: "Insured funds",        d: "Up to $250k of client funds covered by our insurance." },
-          ].map((x) => (
-            <motion.div key={x.t} variants={fadeUp}>
-              <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} className="surface-card rounded-2xl p-6 h-full border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.28)] transition-colors duration-300 cursor-default">
-                <div className="h-12 w-12 rounded-xl bg-[rgba(22,219,147,0.1)] grid place-items-center text-[#16DB93] mb-4"><x.icon className="h-5 w-5" /></div>
-                <h3 className="font-bold mb-2">{x.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{x.d}</p>
-              </motion.div>
-            </motion.div>
-          ))}
+            ))}
+          </motion.div>
         </motion.div>
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="mx-auto max-w-7xl px-4 py-24">
-        <div className="text-center mb-14">
-          <div className="text-sm uppercase tracking-widest text-[#16DB93] mb-3">Testimonials</div>
-          <h2 className="text-4xl md:text-5xl font-bold">Loved by investors</h2>
+      <section className="py-24 border-t border-[rgba(22,219,147,0.06)]">
+        <div className="mx-auto max-w-6xl px-4">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+            className="text-center mb-14">
+            <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-3">Investor Testimonials</div>
+            <h2 className="text-4xl md:text-5xl font-bold">Trusted by thousands</h2>
+          </motion.div>
+
+          <motion.div className="grid md:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
+            {[
+              { name: "Alex M.",    country: "United States", rating: 5, text: "Got my VIP payout in less than 72 hours. No drama, no delays. My capital has grown 8× in 4 months." },
+              { name: "Sarah K.",   country: "United Kingdom", rating: 5, text: "Started with the Basic plan. The returns showed up exactly when they said. Now I'm on Premium BTC." },
+              { name: "Daniel R.", country: "Germany",        rating: 5, text: "The copy trading platform I was looking for. Institutional quality, transparent returns. Highly recommend." },
+            ].map((t) => (
+              <motion.div key={t.name} variants={fadeUp}>
+                <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}
+                  className="surface-card rounded-3xl p-7 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.2)] transition-colors duration-300 h-full flex flex-col">
+                  <div className="flex gap-0.5 mb-4">
+                    {[...Array(t.rating)].map((_, i) => <Star key={i} className="h-4 w-4 fill-[#16DB93] text-[#16DB93]" />)}
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">"{t.text}"</p>
+                  <div className="mt-5 pt-4 border-t border-[rgba(22,219,147,0.06)]">
+                    <div className="font-semibold text-sm">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.country}</div>
+                  </div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
-        <motion.div className="grid md:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-          {[
-            { n: "Sarah K.",  r: "Verified VIP investor", q: "I've tried 5 platforms. YieldEmpire is the only one that pays out exactly as promised, every time." },
-            { n: "Marcus L.", r: "Pro plan investor",      q: "Withdrawals hit my wallet in 12 minutes. The dashboard alone is worth it." },
-            { n: "Aiko T.",   r: "Basic plan investor",    q: "Started with $200. After 6 months I'm reinvesting profits monthly. Game-changer." },
-          ].map((t) => (
-            <motion.div key={t.n} variants={fadeUp} whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
-              <div className="surface-card rounded-2xl border border-[rgba(22,219,147,0.08)] h-full hover:border-[rgba(22,219,147,0.22)] transition-colors duration-300 p-7">
-                <div className="flex gap-1 mb-4">{[...Array(5)].map((_, i) => <Star key={i} className="h-4 w-4 fill-[#16DB93] text-[#16DB93]" />)}</div>
-                <p className="text-sm mb-5 leading-relaxed text-muted-foreground">"{t.q}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full gold-gradient grid place-items-center text-black font-bold text-sm">{t.n[0]}</div>
-                  <div><div className="font-semibold text-sm">{t.n}</div><div className="text-xs text-muted-foreground">{t.r}</div></div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="mx-auto max-w-5xl px-4 py-24">
-        <div className="relative surface-card rounded-3xl p-12 text-center overflow-hidden animate-glow-pulse border border-[rgba(22,219,147,0.2)]">
-          <div className="absolute inset-0 gradient-mesh-bg opacity-60" />
-          {[...Array(5)].map((_, i) => (
-            <motion.div key={i} className="absolute h-1.5 w-1.5 rounded-full bg-[#16DB93]/40 pointer-events-none"
-              style={{ left: `${12 + i * 18}%`, top: `${25 + (i % 3) * 22}%` }}
-              animate={{ y: [-10, 10], opacity: [0.3, 0.7] }}
-              transition={{ duration: 2 + i * 0.5, repeat: Infinity, repeatType: "reverse", delay: i * 0.4 }}
-            />
-          ))}
-          <div className="relative">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Ready to grow your portfolio?</h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">Join thousands earning passive crypto income with YieldEmpireCapital.</p>
-            <Button size="lg" className="gold-gradient text-black h-12 px-9 hover:opacity-90 font-semibold" asChild>
-              <Link to="/auth" search={{ mode: "register" }}>Open your account <ArrowRight className="ml-2 h-4 w-4" /></Link>
+      <section className="py-24 border-t border-[rgba(22,219,147,0.06)] relative overflow-hidden">
+        <div className="absolute inset-0 gradient-mesh-bg opacity-40" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_60%_at_50%_50%,rgba(22,219,147,0.12),transparent_70%)]" />
+
+        {/* Floating particles */}
+        {[...Array(5)].map((_, i) => (
+          <motion.div key={i} className="absolute rounded-full bg-[#16DB93] opacity-10 pointer-events-none"
+            style={{ width: 8 + i * 5, height: 8 + i * 5, left: `${15 + i * 18}%`, top: `${20 + (i % 2) * 50}%` }}
+            animate={{ y: [-20, 20, -20], opacity: [0.06, 0.18, 0.06] }}
+            transition={{ duration: 3 + i * 0.8, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+          />
+        ))}
+
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+          className="relative text-center max-w-3xl mx-auto px-4">
+          <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-4">Start Today</div>
+          <h2 className="text-4xl md:text-6xl font-bold mb-5">
+            Ready to grow<br />your <span className="gold-text">wealth?</span>
+          </h2>
+          <p className="text-muted-foreground text-lg mb-8">Join 12,400+ investors already earning on YieldEmpireCapital. No experience required.</p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Button size="lg" className="gold-gradient text-black hover:opacity-90 h-13 px-10 animate-glow-pulse font-semibold text-base" asChild>
+              <Link to="/auth" search={{ mode: "register" }}>Get Started Free <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+            <Button size="lg" variant="outline" className="h-13 px-8 border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
+              <Link to="/contact">Talk to us</Link>
             </Button>
           </div>
-        </div>
+        </motion.div>
       </section>
+
     </SiteLayout>
   );
 }
