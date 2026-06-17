@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { LogoMark } from "./LogoMark";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
 import { useLanguage } from "@/contexts/language-context";
@@ -77,10 +78,10 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 font-display font-bold group">
-          <div className="relative h-9 w-9 rounded-xl gold-gradient grid place-items-center group-hover:scale-105 transition-transform duration-200 shadow-[0_0_16px_rgba(13,27,62,0.2)]">
-            <span className="text-white text-sm font-black">Y</span>
-          </div>
+        <Link to="/" className="flex items-center gap-2.5 font-display font-bold">
+          <motion.div whileHover={{ scale: 1.07, rotate: 2 }} transition={{ duration: 0.22, ease: "easeOut" }}>
+            <LogoMark size={36} uid="header" />
+          </motion.div>
           <span className={`text-base ${brandCls}`}>Yield<span className="gold-text">Empire</span></span>
         </Link>
 

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useInView, animate, useMotionValue, useSpring, useScroll, useTransform } from "framer-motion";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, type ReactNode } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
 import { Shield, TrendingUp, Wallet, Zap, Users, Lock, ArrowRight, Star, Check, Clock, BarChart3 } from "lucide-react";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/")({
 });
 
 /* ── Animated trading chart canvas background ── */
-function TradingChartBg() {
+function TradingChartBg({ isDark = false }: { isDark?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -120,7 +120,7 @@ function TradingChartBg() {
     draw();
     return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", resize); };
   }, []);
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ opacity: 0.6 }} />;
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ opacity: isDark ? 0.75 : 0.38 }} />;
 }
 
 /* ── Helpers ── */
@@ -134,6 +134,48 @@ function Counter({ to, prefix = "", suffix = "", duration = 2 }: { to: number; p
     return c.stop;
   }, [isInView, to, duration]);
   return <span ref={ref}>{prefix}{display.toLocaleString()}{suffix}</span>;
+}
+
+/* ── Magnetic Button (mouse-tracking spring offset) ── */
+function MagneticButton({ children }: { children: ReactNode }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springX = useSpring(x, { stiffness: 350, damping: 20 });
+  const springY = useSpring(y, { stiffness: 350, damping: 20 });
+  return (
+    <motion.div
+      style={{ x: springX, y: springY }}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        x.set((e.clientX - rect.left - rect.width / 2) * 0.28);
+        y.set((e.clientY - rect.top - rect.height / 2) * 0.28);
+      }}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+    >
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.96 }}>
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ── Word-by-word reveal animation ── */
+function WordReveal({ text, className, delay = 0 }: { text: string; className?: string; delay?: number }) {
+  return (
+    <>
+      {text.split(" ").map((word, i) => (
+        <motion.span
+          key={i}
+          className={`inline-block mr-[0.22em] last:mr-0 ${className ?? ""}`}
+          initial={{ opacity: 0, y: 38, filter: "blur(10px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.62, delay: delay + i * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </>
+  );
 }
 
 function PillCheck({ label }: { label: string }) {
@@ -167,6 +209,7 @@ function MiniBarChart({ bars, active }: { bars: number[]; active?: boolean }) {
 
 /* ── 3D Hero Visual ── */
 function HeroVisual() {
+  const { theme } = useTheme();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const rotX = useSpring(useMotionValue(8), { stiffness: 50, damping: 20 });
@@ -288,7 +331,11 @@ function HeroVisual() {
         animate={{ y: [0, -12, 0], rotate: [-1.5, 1.5, -1.5] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
         className="absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
-        style={{
+        style={theme === "dark" ? {
+          background: "rgba(17,24,39,0.96)",
+          border: "1px solid rgba(22,219,147,0.15)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(22,219,147,0.08)",
+        } : {
           background: "rgba(255,255,255,0.98)",
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)",
@@ -304,7 +351,11 @@ function HeroVisual() {
         animate={{ y: [0, 12, 0], rotate: [1.5, -1.5, 1.5] }}
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
         className="absolute bottom-4 left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
-        style={{
+        style={theme === "dark" ? {
+          background: "rgba(17,24,39,0.96)",
+          border: "1px solid rgba(22,219,147,0.15)",
+          boxShadow: "0 8px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(22,219,147,0.08)",
+        } : {
           background: "rgba(255,255,255,0.98)",
           border: "1px solid rgba(0,0,0,0.08)",
           boxShadow: "0 8px 24px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05)",
@@ -319,8 +370,9 @@ function HeroVisual() {
   );
 }
 
-const fadeUp = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
-const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
+const easeOut = [0.25, 0.46, 0.45, 0.94] as [number, number, number, number];
+const fadeUp = { hidden: { opacity: 0, y: 52, scale: 0.95, filter: "blur(6px)" }, show: { opacity: 1, y: 0, scale: 1, filter: "blur(0px)", transition: { duration: 0.72, ease: easeOut } } };
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.13, delayChildren: 0.08 } } };
 
 /* ── Page ── */
 function Home() {
@@ -337,7 +389,7 @@ function Home() {
       {/* ── HERO — with animated canvas background ── */}
       <section ref={heroRef} className="relative overflow-hidden pt-12 pb-8 min-h-[90vh] flex flex-col justify-center">
         {/* Animated canvas background */}
-        <TradingChartBg />
+        <TradingChartBg isDark={theme === "dark"} />
 
         {/* Gradient overlays */}
         <div className={`absolute inset-0 ${theme === "dark"
@@ -359,11 +411,12 @@ function Home() {
             <span className="text-muted-foreground">{t("hero.badge")}</span>
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1 initial={{ opacity: 0, y: 32, filter: "blur(12px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.8, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.03] tracking-tight mb-5">
-            {t("hero.headline")}<br /><span className="gold-text">{t("hero.headlineAccent")}</span>
-          </motion.h1>
+          {/* Headline — word-by-word reveal */}
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.08] tracking-tight mb-5">
+            <WordReveal text={t("hero.headline")} delay={0.3} />
+            <br />
+            <WordReveal text={t("hero.headlineAccent")} className="gold-text" delay={0.52} />
+          </h1>
 
           <motion.p initial={{ opacity: 0, y: 20, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.7, delay: 0.45 }}
             className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -390,16 +443,16 @@ function Home() {
           {/* CTAs */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.65 }}
             className="flex flex-wrap items-center justify-center gap-3 mb-8">
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            <MagneticButton>
               <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-8 animate-glow-pulse font-semibold text-base" asChild>
                 <Link to="/auth" search={{ mode: "register" }}>{t("hero.cta")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
+            </MagneticButton>
+            <MagneticButton>
               <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 dark:border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
                 <Link to="/plans">{t("hero.ctaSecondary")}</Link>
               </Button>
-            </motion.div>
+            </MagneticButton>
           </motion.div>
 
           {/* Trust badges */}
@@ -442,7 +495,7 @@ function Home() {
       <section className="relative overflow-hidden py-28">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_80%_at_80%_50%,rgba(22,219,147,0.07),transparent_70%)]" />
         <div className="mx-auto max-w-7xl px-4 grid lg:grid-cols-2 gap-16 items-center">
-          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
+          <motion.div initial={{ opacity: 0, x: -55, filter: "blur(8px)" }} whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }} viewport={{ once: true }} transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <div className="text-xs uppercase tracking-widest text-[#16DB93] mb-4">Our Philosophy</div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
               Trade with<br /><span className="gold-text">peace of mind.</span>
@@ -466,10 +519,10 @@ function Home() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, x: 55, filter: "blur(8px)" }}
+            whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
             viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="grid grid-cols-2 gap-4"
           >
             {[
@@ -480,11 +533,11 @@ function Home() {
             ].map((card, i) => (
               <motion.div
                 key={card.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 36, scale: 0.94, filter: "blur(6px)" }}
+                whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                whileHover={{ y: -4 }}
+                transition={{ duration: 0.6, delay: i * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                whileHover={{ y: -6, scale: 1.02 }}
                 className="surface-card rounded-2xl p-5 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.25)] transition-colors duration-300"
               >
                 <div className="h-9 w-9 rounded-xl bg-[rgba(22,219,147,0.1)] grid place-items-center mb-3">
@@ -510,10 +563,10 @@ function Home() {
           <div className="space-y-24">
             {/* Step 01 */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: -65, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.85, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="grid lg:grid-cols-2 gap-12 items-center"
             >
               <div>
@@ -553,10 +606,10 @@ function Home() {
 
             {/* Step 02 */}
             <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: 65, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.85, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="grid lg:grid-cols-2 gap-12 items-center"
             >
               <div className="lg:order-2">
@@ -599,10 +652,10 @@ function Home() {
 
             {/* Step 03 */}
             <motion.div
-              initial={{ opacity: 0, x: -40 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, x: -65, filter: "blur(10px)" }}
+              whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
               viewport={{ once: true }}
-              transition={{ duration: 0.7 }}
+              transition={{ duration: 0.85, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="grid lg:grid-cols-2 gap-12 items-center"
             >
               <div>
@@ -753,20 +806,35 @@ function Home() {
 
           <motion.div className="grid md:grid-cols-3 gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
             {[
-              { name: "Alex M.",    country: "United States", rating: 5, text: "Got my VIP payout in less than 72 hours. No drama, no delays. My capital has grown 8× in 4 months." },
-              { name: "Sarah K.",   country: "United Kingdom", rating: 5, text: "Started with the Basic plan. The returns showed up exactly when they said. Now I'm on Premium BTC." },
-              { name: "Daniel R.", country: "Germany",        rating: 5, text: "The copy trading platform I was looking for. Institutional quality, transparent returns. Highly recommend." },
-            ].map((t) => (
-              <motion.div key={t.name} variants={fadeUp}>
-                <motion.div whileHover={{ scale: 1.02, y: -4 }} transition={{ duration: 0.2 }}
-                  className="surface-card rounded-3xl p-7 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.2)] transition-colors duration-300 h-full flex flex-col">
+              { name: "Alex Morrison",  country: "United States",  rating: 5, text: "Got my VIP payout in less than 72 hours. No drama, no delays. My capital has grown 8× in 4 months.",              avatar: "https://randomuser.me/api/portraits/men/32.jpg" },
+              { name: "Sarah Kim",      country: "United Kingdom", rating: 5, text: "Started with the Basic plan. The returns showed up exactly when they said. Now I'm on Premium BTC.",         avatar: "https://randomuser.me/api/portraits/women/44.jpg" },
+              { name: "Daniel Richter", country: "Germany",        rating: 5, text: "The copy trading platform I was looking for. Institutional quality, transparent returns. Highly recommend.", avatar: "https://randomuser.me/api/portraits/men/67.jpg" },
+            ].map((testimonial) => (
+              <motion.div key={testimonial.name} variants={fadeUp}>
+                <motion.div
+                  whileHover={{ scale: 1.02, y: -6, rotateY: 2 }}
+                  transition={{ duration: 0.22 }}
+                  className="surface-card rounded-3xl p-7 border border-[rgba(22,219,147,0.08)] hover:border-[rgba(22,219,147,0.22)] transition-colors duration-300 h-full flex flex-col"
+                  style={{ transformStyle: "preserve-3d", perspective: "800px" }}
+                >
                   <div className="flex gap-0.5 mb-4">
-                    {[...Array(t.rating)].map((_, i) => <Star key={i} className="h-4 w-4 fill-[#16DB93] text-[#16DB93]" />)}
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <motion.span key={i} initial={{ opacity: 0, scale: 0 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.08, duration: 0.3, type: "spring" }} viewport={{ once: true }}>
+                        <Star className="h-4 w-4 fill-[#16DB93] text-[#16DB93]" />
+                      </motion.span>
+                    ))}
                   </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">"{t.text}"</p>
-                  <div className="mt-5 pt-4 border-t border-[rgba(22,219,147,0.06)]">
-                    <div className="font-semibold text-sm">{t.name}</div>
-                    <div className="text-xs text-muted-foreground">{t.country}</div>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">"{testimonial.text}"</p>
+                  <div className="mt-5 pt-4 border-t border-[rgba(22,219,147,0.06)] flex items-center gap-3">
+                    <img
+                      src={testimonial.avatar}
+                      alt={testimonial.name}
+                      className="h-10 w-10 rounded-full object-cover border-2 border-[rgba(22,219,147,0.25)] shrink-0"
+                    />
+                    <div>
+                      <div className="font-semibold text-sm">{testimonial.name}</div>
+                      <div className="text-xs text-muted-foreground">{testimonial.country}</div>
+                    </div>
                   </div>
                 </motion.div>
               </motion.div>
@@ -797,14 +865,16 @@ function Home() {
           </h2>
           <p className="text-muted-foreground text-lg mb-8">{t("cta.sub")}</p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+            <MagneticButton>
               <Button size="lg" className="gold-gradient text-white hover:opacity-90 h-13 px-10 animate-glow-pulse font-semibold text-base" asChild>
                 <Link to="/auth" search={{ mode: "register" }}>{t("cta.button")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
-            </motion.div>
-            <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 dark:border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
-              <Link to="/contact">{t("cta.secondary")}</Link>
-            </Button>
+            </MagneticButton>
+            <MagneticButton>
+              <Button size="lg" variant="outline" className="h-13 px-8 border-[#0D1B3E]/20 dark:border-white/20 hover:border-[rgba(22,219,147,0.5)] hover:text-[#16DB93] transition-colors" asChild>
+                <Link to="/contact">{t("cta.secondary")}</Link>
+              </Button>
+            </MagneticButton>
           </div>
         </motion.div>
       </section>
