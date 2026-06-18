@@ -145,9 +145,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/plans': typeof PlansRoute
-  '/faq': typeof FaqRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/plans': typeof PlansRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/deposit': typeof AuthenticatedDepositRoute
@@ -167,9 +167,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/plans': typeof PlansRoute
-  '/faq': typeof FaqRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/deposit': typeof AuthenticatedDepositRoute
   '/invest': typeof AuthenticatedInvestRoute
@@ -190,9 +190,9 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
-  '/plans': typeof PlansRoute
-  '/faq': typeof FaqRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
+  '/plans': typeof PlansRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/deposit': typeof AuthenticatedDepositRoute
@@ -214,9 +214,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
-    | '/plans'
-    | '/faq'
     | '/contact'
+    | '/faq'
+    | '/plans'
     | '/admin'
     | '/dashboard'
     | '/deposit'
@@ -236,9 +236,9 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/auth'
-    | '/plans'
-    | '/faq'
     | '/contact'
+    | '/faq'
+    | '/plans'
     | '/dashboard'
     | '/deposit'
     | '/invest'
@@ -258,9 +258,9 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/about'
     | '/auth'
-    | '/plans'
-    | '/faq'
     | '/contact'
+    | '/faq'
+    | '/plans'
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/deposit'
@@ -282,9 +282,9 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
-  PlansRoute: typeof PlansRoute
-  FaqRoute: typeof FaqRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
+  PlansRoute: typeof PlansRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -294,20 +294,6 @@ declare module '@tanstack/react-router' {
       path: '/plans'
       fullPath: '/plans'
       preLoaderRoute: typeof PlansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -322,6 +308,20 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -491,9 +491,9 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
-  PlansRoute: PlansRoute,
-  FaqRoute: FaqRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
+  PlansRoute: PlansRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
