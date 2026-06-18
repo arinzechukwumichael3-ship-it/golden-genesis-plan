@@ -31,7 +31,7 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.55, delay: 0.2 }}
-      className="relative rounded-2xl overflow-hidden mb-4"
+      className="relative rounded-2xl overflow-hidden mb-4 w-full"
       style={{
         background: "linear-gradient(135deg, #0D1B3E 0%, #0a1428 45%, rgba(22,219,147,0.12) 100%)",
         border: "1px solid rgba(22,219,147,0.22)",

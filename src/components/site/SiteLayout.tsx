@@ -34,7 +34,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </div>
 
       <Header />
-      <main className={`flex-1 ${user ? "pb-24 md:pb-0" : ""}`}>{children}</main>
+      <main className={`flex-1 w-full min-w-0 ${user ? "pb-24 md:pb-0" : ""}`}>{children}</main>
       <Footer />
       {user && <BottomNav />}
 
