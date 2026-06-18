@@ -387,7 +387,7 @@ function Home() {
     <SiteLayout>
 
       {/* ── HERO — with animated canvas background ── */}
-      <section ref={heroRef} className="relative pt-6 pb-6 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
+      <section ref={heroRef} className="relative pt-10 pb-8 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
         {/* Animated canvas background */}
         <TradingChartBg isDark={theme === "dark"} />
 
@@ -399,8 +399,8 @@ function Home() {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative mx-auto max-w-5xl px-4 text-center">
-          {/* 3D Visual at top */}
-          <motion.div initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
+          {/* 3D Visual — hidden on mobile, visible from sm (640px) up */}
+          <motion.div className="hidden sm:block" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <HeroVisual />
           </motion.div>
 
