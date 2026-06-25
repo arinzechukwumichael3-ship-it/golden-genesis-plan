@@ -109,10 +109,32 @@
 }
 
 @layer base {
-  html, body { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-sans); transition: background 0.35s ease, color 0.35s ease; }
-  body { overflow-x: clip; }
+  html, body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    transition: background 0.35s ease, color 0.35s ease;
+    /* Mobile responsiveness — prevent any horizontal scroll */
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
   * { border-color: var(--color-border); }
-  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; }
+  /* Media should never overflow its container */
+  img, video, svg, canvas, iframe { max-width: 100%; height: auto; }
+  /* Long, unbroken strings (wallet addresses, hashes) must wrap, not stretch the page */
+  pre, code { overflow-wrap: anywhere; word-break: break-word; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+}
+
+/* Safe responsive page container — opt-in utility */
+@utility container-x {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: 16px;
+  box-sizing: border-box;
 }
 
 /* ── Gold utilities repurposed to navy/green (class names unchanged site-wide) ── */

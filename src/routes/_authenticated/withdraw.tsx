@@ -122,17 +122,18 @@ function Withdraw() {
   };
 
   const isDark = theme === "dark";
-  const cardCls = `rounded-2xl border p-7 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
+  const cardCls = `rounded-2xl border p-4 sm:p-7 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
 
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10">
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="relative rounded-3xl overflow-hidden mb-8 p-8"
+          className="relative rounded-3xl overflow-hidden mb-6 p-5 sm:p-8"
+
           style={{
             background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
             border: "1px solid rgba(22,219,147,0.12)",

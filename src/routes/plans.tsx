@@ -84,13 +84,14 @@ function Plans() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
-        className="mx-auto max-w-6xl px-4 py-20 text-center"
+        className="mx-auto max-w-6xl px-4 py-12 sm:py-20 text-center"
       >
-        <div className="text-sm uppercase tracking-widest text-[#16DB93] mb-3">BTC / USDT Copy Trading Plans</div>
-        <h1 className="text-5xl md:text-6xl font-bold mb-4">Advanced short-term crypto growth engineered for high performance.</h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
+        <div className="text-xs sm:text-sm uppercase tracking-widest text-[#16DB93] mb-3">BTC / USDT Copy Trading Plans</div>
+        <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-4 leading-tight">Advanced short-term crypto growth engineered for high performance.</h1>
+        <p className="text-base sm:text-lg text-muted-foreground max-w-3xl mx-auto mb-10">
           Choose from our professionally managed tiered plans. Returns are credited within 72 hours after payment, backed by our copy trading execution models.
         </p>
+
 
         {/* Feature checklist strip */}
         <div className="flex flex-wrap justify-center gap-5 text-sm text-muted-foreground">
@@ -135,7 +136,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           </div>
         )}
 
-        <CardContent className="p-8">
+        <CardContent className="p-5 sm:p-8">
           <div className="flex items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
