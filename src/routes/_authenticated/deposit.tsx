@@ -191,7 +191,7 @@ function Deposit() {
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55 }}
-          className="relative rounded-3xl overflow-hidden mb-8 p-8"
+          className="relative rounded-3xl overflow-hidden mb-6 p-5 sm:p-8"
           style={{
             background: "linear-gradient(135deg, #0D1B3E 0%, #0A0B0D 55%, rgba(22,219,147,0.06) 100%)",
             border: "1px solid rgba(22,219,147,0.12)",
