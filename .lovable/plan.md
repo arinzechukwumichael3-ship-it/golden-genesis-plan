@@ -1,113 +1,69 @@
+# Plan: Mobile Fixes + Crypto Investment System
 
-# YieldEmpireCapital — Crypto Investment Platform
+This is a large piece of work. I'll split it into two phases so you can review and adjust before I build phase 2.
 
-A dark, gold-accented investment platform with public marketing pages, user dashboard, deposit/withdrawal flows, referrals, and an admin panel. Built on the existing TanStack Start template with Lovable Cloud (Supabase) for auth, database, storage, and server logic.
+---
 
-## Pages & Routes
+## Phase 1 — Mobile responsiveness (site-wide)
 
-Public:
-- `/` — Home: ticker bar, hero with autoplay looping muted background video + headline + Get Started CTA, How It Works (3 steps), Plans overview, Why Choose Us, Testimonials, Footer
-- `/about` — Mission, team grid, security/trust badges
-- `/plans` — 3 plan cards (Basic, Pro, VIP) with duration selector (30/60/90/180/365) and dynamic estimated return
-- `/auth` — Login + Register tabs (email/password, referral code field on register, sign-in-with-google supported)
+Goal: no horizontal scroll, full-width sections, safe containers at 375 / 430 / 768 px.
 
-Authenticated (`/_authenticated/*`):
-- `/dashboard` — Balance, active investments (countdown + expected return), total earned, deposit/withdraw buttons, referral link & stats
-- `/invest` — Choose plan + amount + duration, confirms against active balance
-- `/deposit` — Select BTC/ETH/USDT/BNB, amount, shows wallet address + QR code, upload payment-proof screenshot
-- `/withdraw` — Enter wallet address + amount, status (pending/approved/rejected)
-- `/referrals` — Unique link, total referrals, bonus earned, referred-user list
+1. Verify `<meta name="viewport" content="width=device-width, initial-scale=1.0">` in `src/routes/__root.tsx` head.
+2. Add global guards in `src/styles.css`:
+   - `html, body { overflow-x: hidden; max-width: 100vw; }`
+   - `img, video, svg { max-width: 100%; height: auto; }`
+   - `.container-x { width: 100%; max-width: 1200px; margin-inline: auto; padding-inline: 16px; box-sizing: border-box; }`
+3. Audit and patch fixed-width / overflow offenders on:
+   - Home (`src/routes/index.tsx`)
+   - Plans (`src/routes/plans.tsx`)
+   - Header / Footer / BottomNav
+   - Referrals page (called out specifically) — wrap tables in `overflow-x-auto`, make referral-link row use `grid-cols-[minmax(0,1fr)_auto]` + `min-w-0` + `truncate` per the responsive-layout rule
+   - Dashboard, Deposit, Withdraw, Admin pages — same audit
+4. Replace any `w-[700px]` / fixed pixel widths with `w-full max-w-[Npx]`.
 
-Admin (`/_authenticated/admin/*`, gated by `has_role(admin)`):
-- `/admin` — overview
-- `/admin/users` — list, view balances
-- `/admin/deposits` — approve/reject (on approve, credit balance)
-- `/admin/withdrawals` — approve/reject (on approve, debit + mark paid)
-- `/admin/plans` — edit ROI %, min amount
-- `/admin/wallets` — edit wallet addresses per coin
-- `/admin/referrals` — view referral activity
-- `/admin/notifications` — broadcast notifications
+---
 
-Global UI: fixed top scrolling ticker (fake BTC/ETH/BNB/USDT prices animated), floating "Invest Now" button on mobile when signed-in.
+## Phase 2 — Crypto Investment System
 
-## Design
+Note: an `investments` / `plans` / `deposits` system already exists in this project (see `_authenticated/invest.tsx`, `admin/plans.tsx`, `admin/deposits.tsx`, `admin/wallets.tsx`). I will **extend** it rather than create parallel tables, to avoid breaking the existing admin flows.
 
-- Background `#0a0a0a`, surfaces `#111`, gold accent `#f0b429`, white text, muted `#a1a1aa`
-- Display font: Space Grotesk; body: Inter (loaded via `<link>` in `__root.tsx`)
-- Subtle radial/linear gold gradients on hero, card shadows with gold glow
-- Framer-motion: hero text fade-up, plan card hover lift, ticker marquee (CSS keyframes), section reveal on scroll
-- Fully responsive; mobile bottom-floating CTA
+### 2a. Database migration (single migration, awaiting your approval)
 
-## Backend (Lovable Cloud)
+- Extend `public.plans`: add `max_amount`, `duration_days` (if missing — current schema has `min_amount`, `roi_percent`). Seed the 7 tiers:
+  Basic Deluxe, Promo Package, Elite Deluxe, Pro Deluxe, Contract I, Contract II, Contract III with the ranges you listed.
+- Extend `public.wallets`: add `coin_name`, `network`, `symbol`, `is_active`, `logo_key`. Seed BTC, ETH, USDT-TRC20, USDT-ERC20, USDT-BEP20, TRX rows (addresses blank, admin fills in).
+- Extend `public.investments`: add `payment_method`, `wallet_address_used`, `tx_hash`, `proof_url`, `maturity_date`.
+- New `public.earnings_log` table (user_id, investment_id, amount, type, credited_at) with RLS + GRANTs.
+- Update `create_investment` RPC to accept `payment_method` and enforce `min_amount`/`max_amount`.
 
-Enable Cloud first. Migrations:
+### 2b. New investment flow pages (teal EnzoBank styling, mobile-first, white cards, no dark sidebar)
 
-Enums: `app_role ('admin','user')`, `coin ('BTC','ETH','USDT','BNB')`, `tx_status ('pending','approved','rejected')`, `investment_status ('active','completed','cancelled')`.
+- `/_authenticated/invest/new` — plan selector, custom dropdown with plan cards, payment method 2×3 grid, amount input with min/max validation, order summary, "Proceed to Deposit".
+- `/_authenticated/invest/deposit/$id` — wallet address + QR code (using `qrcode.react`), copy button, 30-min countdown, "I have made the payment".
+- `/_authenticated/invest/deposit/$id/proof` — upload screenshot to existing `payment-proofs` storage bucket OR enter tx hash.
+- `/_authenticated/invest/deposit/$id/confirm` — success screen with green check animation.
+- `/_authenticated/invest/portfolio` — stats row + investment cards + progress bars + empty state.
+- `/_authenticated/invest/earnings` — filter tabs (All / Credited / Pending), list, running total.
+- Existing `/_authenticated/invest` page kept as redirect → `/invest/new` (or repurposed as portfolio).
 
-Tables (all in `public`, with proper GRANTs + RLS):
-- `profiles` (id PK→auth.users, email, full_name, referral_code unique, referred_by uuid→profiles, balance numeric default 0, total_earned numeric default 0, created_at)
-- `user_roles` (id, user_id, role app_role, unique(user_id, role)) — separate from profiles
-- `plans` (id, name, min_amount, roi_percent, sort_order, active) — seeded Basic/Pro/VIP
-- `wallets` (coin PK, address text, qr_url text) — admin editable
-- `deposits` (id, user_id, coin, amount, proof_url, status, created_at, reviewed_at, reviewed_by)
-- `withdrawals` (id, user_id, coin, amount, wallet_address, status, created_at, reviewed_at, reviewed_by)
-- `investments` (id, user_id, plan_id, amount, duration_days, roi_percent_snapshot, expected_return, start_at, end_at, status)
-- `referrals` (id, referrer_id, referred_id unique, bonus_paid bool, bonus_amount numeric, created_at)
-- `notifications` (id, user_id nullable for broadcast, title, body, read, created_at)
+### 2c. Admin
 
-Triggers/functions (SECURITY DEFINER, `set search_path = public`):
-- `handle_new_user()` on `auth.users` insert → creates profile, generates unique referral_code, links `referred_by` from raw_user_meta_data.ref, inserts `referrals` row
-- `has_role(_user_id, _role)` for RLS
-- `approve_deposit(deposit_id)` admin RPC: marks approved, credits balance, on user's first approved deposit pays 5% referral bonus to referrer (updates referrer balance + total_earned, marks referrals.bonus_paid)
-- `approve_withdrawal(id)` / `reject_*` admin RPCs
-- `create_investment(plan_id, amount, duration_days)` user RPC: validates min, debits balance, creates row with computed expected_return = amount * roi_percent * duration_days/365 (or simple flat ROI for plan duration — final formula documented in code), sets start_at/end_at
-- `complete_due_investments()` callable from cron later (out of scope to schedule, but function exists)
+- Extend `/_authenticated/admin/plans` to manage ROI, duration, max_amount, active status for the 7 tiers.
+- Extend `/_authenticated/admin/wallets` to manage per-coin address + active toggle.
+- `/_authenticated/admin/deposits` already lists pending + approve/reject — verify it shows new `tx_hash` and `proof_url`.
 
-RLS:
-- profiles: user reads/updates own; admin reads all
-- user_roles: user reads own; admin manages
-- plans/wallets: anon+authenticated SELECT; admin write
-- deposits/withdrawals/investments/referrals/notifications: user reads own rows; admin reads all; writes via RPCs
+### 2d. Tech notes
 
-Seeded admin: insert into `auth.users` is not possible via migration. Instead, seed `wallets`, `plans`, and create a trigger/insert so that any user with email `admin@yieldempire.local` automatically gets the admin role. The migration also inserts a `user_roles` row for that email if it later signs up (using `handle_new_user`). **Default admin credentials to share with user: email `admin@yieldempire.local`, password `Admin#2026!` — user signs up with that email once and gets admin automatically.** (Documented in README.)
+- Use existing teal tokens in `src/styles.css`; no hardcoded hex.
+- Use `qrcode.react` (add via bun).
+- Currency display uses existing `CurrencySwitcher` / `src/lib/currency.tsx`.
+- All server reads via `supabase` browser client (user-scoped, RLS applies).
 
-Storage: bucket `payment-proofs` (private), RLS: user uploads to `userId/...`, admin reads all.
+---
 
-## Server Functions (`createServerFn`, auth-protected via `requireSupabaseAuth`)
+## What I need from you before I start
 
-In `src/lib/`:
-- `plans.functions.ts` — `listPlans` (public)
-- `wallets.functions.ts` — `listWallets` (public)
-- `investments.functions.ts` — `createInvestment`, `listMyInvestments`
-- `deposits.functions.ts` — `createDeposit`, `listMyDeposits`
-- `withdrawals.functions.ts` — `createWithdrawal`, `listMyWithdrawals`
-- `referrals.functions.ts` — `myReferralStats`
-- `dashboard.functions.ts` — `getDashboardSummary`
-- `admin.functions.ts` — list/approve/reject for deposits, withdrawals; update plan, update wallet, broadcast notification (all gated by `has_role admin` check)
-
-## Hero Video
-
-Use a free Coverr/Pexels crypto/abstract loop. Upload via `lovable-assets create --file /tmp/hero.mp4` and reference the CDN URL. Fallback poster image.
-
-## Ticker
-
-Client component fetching `https://api.coingecko.com/api/v3/simple/price` for BTC/ETH/BNB/USDT with 30s refresh; falls back to static values if request fails. Horizontal marquee via CSS keyframes.
-
-## Out of scope (will note to user)
-
-- Real on-chain payment verification (admin manually approves screenshot)
-- Scheduled job to auto-complete matured investments (function exists; user can wire pg_cron later)
-- Email notifications
-
-## Build order
-
-1. Enable Lovable Cloud
-2. Migration: enums, tables, GRANTs, RLS, functions, seeds (plans, wallets, admin-on-signup)
-3. Storage bucket + policies
-4. Layout: ticker, header, footer, floating CTA, theme tokens in `src/styles.css`, font links in `__root.tsx`
-5. Public pages (Home, About, Plans, Auth) + hero video asset
-6. `_authenticated` layout already managed by integration; build Dashboard, Invest, Deposit, Withdraw, Referrals
-7. Admin pages + server fns
-8. Polish animations, responsive QA
-
-I'll share the admin login + the public referral signup link after the first build.
+1. **Phase 1 only first, or both phases in one go?** Phase 2 is several hours of work and a DB migration.
+2. **Existing data:** I'll seed the 7 new plan tiers. OK to leave any existing plan rows in place (just marked inactive), or wipe and replace?
+3. **ROI / duration values:** you didn't specify per-tier ROI% or duration days. I'll default to: Basic 15%/30d, Promo 25%/45d, Elite 35%/60d, Pro 50%/90d, Contract I 80%/120d, II 120%/150d, III 200%/180d — confirm or override.
+4. **Existing `invest.tsx` page:** keep as redirect to `/invest/portfolio`, or fully replace its content with the new flow?
