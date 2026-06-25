@@ -180,11 +180,12 @@ function Deposit() {
   };
 
   const isDark = theme === "dark";
-  const cardCls = `rounded-2xl border p-7 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
+  const cardCls = `rounded-2xl border p-4 sm:p-7 ${isDark ? "bg-[rgba(10,11,13,0.85)] border-[rgba(22,219,147,0.1)]" : "bg-white border-[rgba(22,219,147,0.12)] shadow-sm"}`;
 
   return (
     <SiteLayout>
-      <section className="mx-auto max-w-5xl px-4 py-10">
+      <section className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10">
+
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
