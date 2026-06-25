@@ -136,7 +136,7 @@ function PlanCard({ plan }: { plan: Plan }) {
           </div>
         )}
 
-        <CardContent className="p-8">
+        <CardContent className="p-5 sm:p-8">
           <div className="flex items-center justify-between gap-4 mb-6">
             <div>
               <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
