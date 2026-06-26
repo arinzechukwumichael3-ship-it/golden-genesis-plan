@@ -318,7 +318,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       coin: "BTC" | "ETH" | "USDT" | "BNB"
-      investment_status: "active" | "completed" | "cancelled"
+      investment_status: "pending" | "active" | "completed" | "cancelled"
       tx_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
@@ -449,7 +449,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       coin: ["BTC", "ETH", "USDT", "BNB"],
-      investment_status: ["active", "completed", "cancelled"],
+      investment_status: ["pending", "active", "completed", "cancelled"],
       tx_status: ["pending", "approved", "rejected"],
     },
   },
