@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      crypto_wallets: {
+        Row: {
+          coin_name: string
+          created_at: string
+          id: string
+          is_active: boolean
+          network: string
+          sort_order: number
+          symbol: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          coin_name: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          network: string
+          sort_order?: number
+          symbol: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Update: {
+          coin_name?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          network?: string
+          sort_order?: number
+          symbol?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
       deposits: {
         Row: {
           amount: number
@@ -50,6 +86,41 @@ export type Database = {
         }
         Relationships: []
       }
+      earnings_log: {
+        Row: {
+          amount: number
+          credited_at: string
+          id: string
+          investment_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          credited_at?: string
+          id?: string
+          investment_id?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          credited_at?: string
+          id?: string
+          investment_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "earnings_log_investment_id_fkey"
+            columns: ["investment_id"]
+            isOneToOne: false
+            referencedRelation: "investments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investments: {
         Row: {
           amount: number
@@ -57,11 +128,16 @@ export type Database = {
           end_at: string
           expected_return: number
           id: string
+          maturity_date: string | null
+          payment_method: string | null
           plan_id: string
+          proof_url: string | null
           roi_percent_snapshot: number
           start_at: string
           status: Database["public"]["Enums"]["investment_status"]
+          tx_hash: string | null
           user_id: string
+          wallet_address_used: string | null
         }
         Insert: {
           amount: number
@@ -69,11 +145,16 @@ export type Database = {
           end_at: string
           expected_return: number
           id?: string
+          maturity_date?: string | null
+          payment_method?: string | null
           plan_id: string
+          proof_url?: string | null
           roi_percent_snapshot: number
           start_at?: string
           status?: Database["public"]["Enums"]["investment_status"]
+          tx_hash?: string | null
           user_id: string
+          wallet_address_used?: string | null
         }
         Update: {
           amount?: number
@@ -81,11 +162,16 @@ export type Database = {
           end_at?: string
           expected_return?: number
           id?: string
+          maturity_date?: string | null
+          payment_method?: string | null
           plan_id?: string
+          proof_url?: string | null
           roi_percent_snapshot?: number
           start_at?: string
           status?: Database["public"]["Enums"]["investment_status"]
+          tx_hash?: string | null
           user_id?: string
+          wallet_address_used?: string | null
         }
         Relationships: [
           {
@@ -127,7 +213,9 @@ export type Database = {
       plans: {
         Row: {
           active: boolean
+          duration_days: number
           id: string
+          max_amount: number | null
           min_amount: number
           name: string
           roi_percent: number
@@ -136,7 +224,9 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          duration_days?: number
           id?: string
+          max_amount?: number | null
           min_amount: number
           name: string
           roi_percent: number
@@ -145,7 +235,9 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          duration_days?: number
           id?: string
+          max_amount?: number | null
           min_amount?: number
           name?: string
           roi_percent?: number
@@ -303,6 +395,15 @@ export type Database = {
       approve_withdrawal: { Args: { _id: string }; Returns: undefined }
       create_investment: {
         Args: { _amount: number; _duration_days: number; _plan_id: string }
+        Returns: string
+      }
+      create_pending_investment: {
+        Args: {
+          _amount: number
+          _payment_method: string
+          _plan_id: string
+          _wallet_address?: string
+        }
         Returns: string
       }
       has_role: {
