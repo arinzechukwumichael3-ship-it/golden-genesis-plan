@@ -65,7 +65,7 @@ function NewInvestment() {
       _plan_id: plan.id,
       _amount: amt,
       _payment_method: paymentKey(wallet),
-      _wallet_address: wallet.wallet_address || null,
+      _wallet_address: wallet.wallet_address || undefined,
     });
     setSubmitting(false);
     if (error) return toast.error(error.message);

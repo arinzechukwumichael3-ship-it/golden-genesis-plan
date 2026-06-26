@@ -23,6 +23,9 @@ import { Route as AuthenticatedDepositRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
+import { Route as AuthenticatedInvestPortfolioRouteImport } from './routes/_authenticated/invest.portfolio'
+import { Route as AuthenticatedInvestNewRouteImport } from './routes/_authenticated/invest.new'
+import { Route as AuthenticatedInvestEarningsRouteImport } from './routes/_authenticated/invest.earnings'
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin/withdrawals'
 import { Route as AuthenticatedAdminWalletsRouteImport } from './routes/_authenticated/admin/wallets'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
@@ -30,6 +33,9 @@ import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin/plans'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
 import { Route as AuthenticatedAdminDepositsRouteImport } from './routes/_authenticated/admin/deposits'
+import { Route as AuthenticatedInvestDepositIdRouteImport } from './routes/_authenticated/invest.deposit.$id'
+import { Route as AuthenticatedInvestDepositIdProofRouteImport } from './routes/_authenticated/invest.deposit.$id.proof'
+import { Route as AuthenticatedInvestDepositIdConfirmRouteImport } from './routes/_authenticated/invest.deposit.$id.confirm'
 
 const PlansRoute = PlansRouteImport.update({
   id: '/plans',
@@ -100,6 +106,23 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedInvestPortfolioRoute =
+  AuthenticatedInvestPortfolioRouteImport.update({
+    id: '/portfolio',
+    path: '/portfolio',
+    getParentRoute: () => AuthenticatedInvestRoute,
+  } as any)
+const AuthenticatedInvestNewRoute = AuthenticatedInvestNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AuthenticatedInvestRoute,
+} as any)
+const AuthenticatedInvestEarningsRoute =
+  AuthenticatedInvestEarningsRouteImport.update({
+    id: '/earnings',
+    path: '/earnings',
+    getParentRoute: () => AuthenticatedInvestRoute,
+  } as any)
 const AuthenticatedAdminWithdrawalsRoute =
   AuthenticatedAdminWithdrawalsRouteImport.update({
     id: '/withdrawals',
@@ -140,6 +163,24 @@ const AuthenticatedAdminDepositsRoute =
     path: '/deposits',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedInvestDepositIdRoute =
+  AuthenticatedInvestDepositIdRouteImport.update({
+    id: '/deposit/$id',
+    path: '/deposit/$id',
+    getParentRoute: () => AuthenticatedInvestRoute,
+  } as any)
+const AuthenticatedInvestDepositIdProofRoute =
+  AuthenticatedInvestDepositIdProofRouteImport.update({
+    id: '/proof',
+    path: '/proof',
+    getParentRoute: () => AuthenticatedInvestDepositIdRoute,
+  } as any)
+const AuthenticatedInvestDepositIdConfirmRoute =
+  AuthenticatedInvestDepositIdConfirmRouteImport.update({
+    id: '/confirm',
+    path: '/confirm',
+    getParentRoute: () => AuthenticatedInvestDepositIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -151,7 +192,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/deposit': typeof AuthenticatedDepositRoute
-  '/invest': typeof AuthenticatedInvestRoute
+  '/invest': typeof AuthenticatedInvestRouteWithChildren
   '/referrals': typeof AuthenticatedReferralsRoute
   '/withdraw': typeof AuthenticatedWithdrawRoute
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
@@ -161,7 +202,13 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
+  '/invest/earnings': typeof AuthenticatedInvestEarningsRoute
+  '/invest/new': typeof AuthenticatedInvestNewRoute
+  '/invest/portfolio': typeof AuthenticatedInvestPortfolioRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
+  '/invest/deposit/$id': typeof AuthenticatedInvestDepositIdRouteWithChildren
+  '/invest/deposit/$id/confirm': typeof AuthenticatedInvestDepositIdConfirmRoute
+  '/invest/deposit/$id/proof': typeof AuthenticatedInvestDepositIdProofRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -172,7 +219,7 @@ export interface FileRoutesByTo {
   '/plans': typeof PlansRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/deposit': typeof AuthenticatedDepositRoute
-  '/invest': typeof AuthenticatedInvestRoute
+  '/invest': typeof AuthenticatedInvestRouteWithChildren
   '/referrals': typeof AuthenticatedReferralsRoute
   '/withdraw': typeof AuthenticatedWithdrawRoute
   '/admin/deposits': typeof AuthenticatedAdminDepositsRoute
@@ -182,7 +229,13 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
+  '/invest/earnings': typeof AuthenticatedInvestEarningsRoute
+  '/invest/new': typeof AuthenticatedInvestNewRoute
+  '/invest/portfolio': typeof AuthenticatedInvestPortfolioRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/invest/deposit/$id': typeof AuthenticatedInvestDepositIdRouteWithChildren
+  '/invest/deposit/$id/confirm': typeof AuthenticatedInvestDepositIdConfirmRoute
+  '/invest/deposit/$id/proof': typeof AuthenticatedInvestDepositIdProofRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -196,7 +249,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/deposit': typeof AuthenticatedDepositRoute
-  '/_authenticated/invest': typeof AuthenticatedInvestRoute
+  '/_authenticated/invest': typeof AuthenticatedInvestRouteWithChildren
   '/_authenticated/referrals': typeof AuthenticatedReferralsRoute
   '/_authenticated/withdraw': typeof AuthenticatedWithdrawRoute
   '/_authenticated/admin/deposits': typeof AuthenticatedAdminDepositsRoute
@@ -206,7 +259,13 @@ export interface FileRoutesById {
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/_authenticated/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
+  '/_authenticated/invest/earnings': typeof AuthenticatedInvestEarningsRoute
+  '/_authenticated/invest/new': typeof AuthenticatedInvestNewRoute
+  '/_authenticated/invest/portfolio': typeof AuthenticatedInvestPortfolioRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/invest/deposit/$id': typeof AuthenticatedInvestDepositIdRouteWithChildren
+  '/_authenticated/invest/deposit/$id/confirm': typeof AuthenticatedInvestDepositIdConfirmRoute
+  '/_authenticated/invest/deposit/$id/proof': typeof AuthenticatedInvestDepositIdProofRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,7 +289,13 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallets'
     | '/admin/withdrawals'
+    | '/invest/earnings'
+    | '/invest/new'
+    | '/invest/portfolio'
     | '/admin/'
+    | '/invest/deposit/$id'
+    | '/invest/deposit/$id/confirm'
+    | '/invest/deposit/$id/proof'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -251,7 +316,13 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/wallets'
     | '/admin/withdrawals'
+    | '/invest/earnings'
+    | '/invest/new'
+    | '/invest/portfolio'
     | '/admin'
+    | '/invest/deposit/$id'
+    | '/invest/deposit/$id/confirm'
+    | '/invest/deposit/$id/proof'
   id:
     | '__root__'
     | '/'
@@ -274,7 +345,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/wallets'
     | '/_authenticated/admin/withdrawals'
+    | '/_authenticated/invest/earnings'
+    | '/_authenticated/invest/new'
+    | '/_authenticated/invest/portfolio'
     | '/_authenticated/admin/'
+    | '/_authenticated/invest/deposit/$id'
+    | '/_authenticated/invest/deposit/$id/confirm'
+    | '/_authenticated/invest/deposit/$id/proof'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -387,6 +464,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/invest/portfolio': {
+      id: '/_authenticated/invest/portfolio'
+      path: '/portfolio'
+      fullPath: '/invest/portfolio'
+      preLoaderRoute: typeof AuthenticatedInvestPortfolioRouteImport
+      parentRoute: typeof AuthenticatedInvestRoute
+    }
+    '/_authenticated/invest/new': {
+      id: '/_authenticated/invest/new'
+      path: '/new'
+      fullPath: '/invest/new'
+      preLoaderRoute: typeof AuthenticatedInvestNewRouteImport
+      parentRoute: typeof AuthenticatedInvestRoute
+    }
+    '/_authenticated/invest/earnings': {
+      id: '/_authenticated/invest/earnings'
+      path: '/earnings'
+      fullPath: '/invest/earnings'
+      preLoaderRoute: typeof AuthenticatedInvestEarningsRouteImport
+      parentRoute: typeof AuthenticatedInvestRoute
+    }
     '/_authenticated/admin/withdrawals': {
       id: '/_authenticated/admin/withdrawals'
       path: '/withdrawals'
@@ -436,6 +534,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminDepositsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/invest/deposit/$id': {
+      id: '/_authenticated/invest/deposit/$id'
+      path: '/deposit/$id'
+      fullPath: '/invest/deposit/$id'
+      preLoaderRoute: typeof AuthenticatedInvestDepositIdRouteImport
+      parentRoute: typeof AuthenticatedInvestRoute
+    }
+    '/_authenticated/invest/deposit/$id/proof': {
+      id: '/_authenticated/invest/deposit/$id/proof'
+      path: '/proof'
+      fullPath: '/invest/deposit/$id/proof'
+      preLoaderRoute: typeof AuthenticatedInvestDepositIdProofRouteImport
+      parentRoute: typeof AuthenticatedInvestDepositIdRoute
+    }
+    '/_authenticated/invest/deposit/$id/confirm': {
+      id: '/_authenticated/invest/deposit/$id/confirm'
+      path: '/confirm'
+      fullPath: '/invest/deposit/$id/confirm'
+      preLoaderRoute: typeof AuthenticatedInvestDepositIdConfirmRouteImport
+      parentRoute: typeof AuthenticatedInvestDepositIdRoute
+    }
   }
 }
 
@@ -464,11 +583,47 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
 const AuthenticatedAdminRouteWithChildren =
   AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
+interface AuthenticatedInvestDepositIdRouteChildren {
+  AuthenticatedInvestDepositIdConfirmRoute: typeof AuthenticatedInvestDepositIdConfirmRoute
+  AuthenticatedInvestDepositIdProofRoute: typeof AuthenticatedInvestDepositIdProofRoute
+}
+
+const AuthenticatedInvestDepositIdRouteChildren: AuthenticatedInvestDepositIdRouteChildren =
+  {
+    AuthenticatedInvestDepositIdConfirmRoute:
+      AuthenticatedInvestDepositIdConfirmRoute,
+    AuthenticatedInvestDepositIdProofRoute:
+      AuthenticatedInvestDepositIdProofRoute,
+  }
+
+const AuthenticatedInvestDepositIdRouteWithChildren =
+  AuthenticatedInvestDepositIdRoute._addFileChildren(
+    AuthenticatedInvestDepositIdRouteChildren,
+  )
+
+interface AuthenticatedInvestRouteChildren {
+  AuthenticatedInvestEarningsRoute: typeof AuthenticatedInvestEarningsRoute
+  AuthenticatedInvestNewRoute: typeof AuthenticatedInvestNewRoute
+  AuthenticatedInvestPortfolioRoute: typeof AuthenticatedInvestPortfolioRoute
+  AuthenticatedInvestDepositIdRoute: typeof AuthenticatedInvestDepositIdRouteWithChildren
+}
+
+const AuthenticatedInvestRouteChildren: AuthenticatedInvestRouteChildren = {
+  AuthenticatedInvestEarningsRoute: AuthenticatedInvestEarningsRoute,
+  AuthenticatedInvestNewRoute: AuthenticatedInvestNewRoute,
+  AuthenticatedInvestPortfolioRoute: AuthenticatedInvestPortfolioRoute,
+  AuthenticatedInvestDepositIdRoute:
+    AuthenticatedInvestDepositIdRouteWithChildren,
+}
+
+const AuthenticatedInvestRouteWithChildren =
+  AuthenticatedInvestRoute._addFileChildren(AuthenticatedInvestRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedDepositRoute: typeof AuthenticatedDepositRoute
-  AuthenticatedInvestRoute: typeof AuthenticatedInvestRoute
+  AuthenticatedInvestRoute: typeof AuthenticatedInvestRouteWithChildren
   AuthenticatedReferralsRoute: typeof AuthenticatedReferralsRoute
   AuthenticatedWithdrawRoute: typeof AuthenticatedWithdrawRoute
 }
@@ -477,7 +632,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedDepositRoute: AuthenticatedDepositRoute,
-  AuthenticatedInvestRoute: AuthenticatedInvestRoute,
+  AuthenticatedInvestRoute: AuthenticatedInvestRouteWithChildren,
   AuthenticatedReferralsRoute: AuthenticatedReferralsRoute,
   AuthenticatedWithdrawRoute: AuthenticatedWithdrawRoute,
 }
