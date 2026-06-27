@@ -57,15 +57,20 @@ export function Header() {
 
   const currentLoc = LOCALES.find((l) => l.code === locale)!;
 
-  const navLinks = (
+  // When logged in, hide the public marketing links (Home/Plans/About/FAQ/Contact)
+  // since BottomNav + Dashboard already handle authenticated navigation.
+  const navLinks = user ? (
+    <>
+      <Link to="/dashboard" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.dashboard")}</Link>
+      {isAdmin && <Link to="/admin" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>Admin</Link>}
+    </>
+  ) : (
     <>
       <Link to="/" className={linkCls} activeOptions={{ exact: true }} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.home")}</Link>
       <Link to="/plans" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.plans")}</Link>
       <Link to="/about" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.about")}</Link>
       <Link to="/faq" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.faq")}</Link>
       <Link to="/contact" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.contact")}</Link>
-      {user && <Link to="/dashboard" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>{t("nav.dashboard")}</Link>}
-      {isAdmin && <Link to="/admin" className={linkCls} activeProps={{ className: `${linkCls} ${activeCls}` }}>Admin</Link>}
     </>
   );
 
