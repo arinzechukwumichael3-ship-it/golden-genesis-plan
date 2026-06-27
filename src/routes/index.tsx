@@ -330,7 +330,7 @@ function HeroVisual() {
       <motion.div
         animate={{ y: [0, -12, 0], rotate: [-1.5, 1.5, -1.5] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
-        className="hidden sm:block absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
+        className="block absolute top-0 right-0 sm:top-4 sm:right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
         style={theme === "dark" ? {
           background: "rgba(17,24,39,0.96)",
           border: "1px solid rgba(22,219,147,0.15)",
@@ -350,7 +350,7 @@ function HeroVisual() {
       <motion.div
         animate={{ y: [0, 12, 0], rotate: [1.5, -1.5, 1.5] }}
         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
-        className="hidden sm:block absolute bottom-4 left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
+        className="block absolute bottom-0 left-0 sm:bottom-4 sm:left-4 md:left-10 z-20 rounded-2xl overflow-hidden"
         style={theme === "dark" ? {
           background: "rgba(17,24,39,0.96)",
           border: "1px solid rgba(22,219,147,0.15)",
@@ -387,7 +387,7 @@ function Home() {
     <SiteLayout>
 
       {/* ── HERO — with animated canvas background ── */}
-      <section ref={heroRef} className="relative pt-10 pb-8 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
+      <section ref={heroRef} className="relative pt-20 pb-8 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
         {/* Animated canvas background */}
         <TradingChartBg isDark={theme === "dark"} />
 
