@@ -330,7 +330,7 @@ function HeroVisual() {
       <motion.div
         animate={{ y: [0, -12, 0], rotate: [-1.5, 1.5, -1.5] }}
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}
-        className="hidden sm:block absolute top-4 right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
+        className="block absolute top-0 right-0 sm:top-4 sm:right-4 md:right-10 z-20 rounded-2xl overflow-hidden"
         style={theme === "dark" ? {
           background: "rgba(17,24,39,0.96)",
           border: "1px solid rgba(22,219,147,0.15)",
