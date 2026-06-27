@@ -387,7 +387,7 @@ function Home() {
     <SiteLayout>
 
       {/* ── HERO — with animated canvas background ── */}
-      <section ref={heroRef} className="relative pt-10 pb-8 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
+      <section ref={heroRef} className="relative pt-20 pb-8 sm:pt-12 sm:pb-8 sm:min-h-[90vh] flex flex-col justify-center">
         {/* Animated canvas background */}
         <TradingChartBg isDark={theme === "dark"} />
 
