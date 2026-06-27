@@ -399,8 +399,8 @@ function Home() {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative mx-auto max-w-5xl px-4 text-center">
-          {/* 3D Visual — hidden on mobile, visible from sm (640px) up */}
-          <motion.div className="hidden sm:block" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
+          {/* 3D Visual — visible on all viewports */}
+          <motion.div className="block mb-4 sm:mb-0" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <HeroVisual />
           </motion.div>
 
