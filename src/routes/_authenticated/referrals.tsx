@@ -62,16 +62,16 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
         </div>
 
         {/* Code */}
-        <div className="mb-4 sm:mb-7">
+        <div className="mb-4 sm:mb-7 min-w-0">
           <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1.5">Your referral code</div>
-          <div className="text-2xl sm:text-3xl font-bold tracking-[0.16em] gold-text font-mono">{code || "———"}</div>
+          <div className="text-xl sm:text-3xl font-bold tracking-[0.08em] sm:tracking-[0.16em] gold-text font-mono break-all">{code || "———"}</div>
         </div>
 
         {/* Link */}
-        <div>
+        <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Shareable link</div>
-          <div className="flex gap-2 items-center">
-            <code className="flex-1 bg-black/40 border border-white/[0.06] rounded-xl px-4 py-2.5 text-xs text-white/50 font-mono truncate">
+          <div className="flex gap-2 items-center min-w-0">
+            <code className="flex-1 min-w-0 bg-black/40 border border-white/[0.06] rounded-xl px-3 sm:px-4 py-2.5 text-xs text-white/50 font-mono truncate">
               {link}
             </code>
             <motion.button
