@@ -50,14 +50,14 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
 
       <div className="relative p-4 sm:p-7">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4 sm:mb-8">
-          <div>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 mb-4 sm:mb-8">
+          <div className="min-w-0">
             <div className="text-[10px] uppercase tracking-[0.2em] text-[#16DB93]/70 mb-0.5">YieldEmpire Capital</div>
             <div className="text-xs text-white/30">Referral Program</div>
           </div>
-          <div className="flex items-center gap-2 bg-[rgba(22,219,147,0.1)] border border-[rgba(22,219,147,0.25)] rounded-full px-3 py-1">
+          <div className="shrink-0 flex items-center gap-1.5 bg-[rgba(22,219,147,0.1)] border border-[rgba(22,219,147,0.25)] rounded-full px-2.5 sm:px-3 py-1">
             <Star className="h-3 w-3 text-[#16DB93]" fill="#16DB93" />
-            <span className="text-xs font-semibold text-[#16DB93]">5% Bonus</span>
+            <span className="text-[11px] sm:text-xs font-semibold text-[#16DB93] whitespace-nowrap">5% Bonus</span>
           </div>
         </div>
 
@@ -70,7 +70,7 @@ function ReferralCard({ code, link, onCopy, copied }: { code: string; link: stri
         {/* Link */}
         <div className="min-w-0">
           <div className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Shareable link</div>
-          <div className="flex gap-2 items-center min-w-0">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-2 items-center min-w-0">
             <code className="flex-1 min-w-0 bg-black/40 border border-white/[0.06] rounded-xl px-3 sm:px-4 py-2.5 text-xs text-white/50 font-mono truncate">
               {link}
             </code>
@@ -131,7 +131,7 @@ function Referrals() {
 
   return (
     <SiteLayout>
-      <section className="w-full mx-auto max-w-4xl px-4 py-4 sm:py-8">
+      <section className="w-full mx-auto max-w-4xl px-3.5 sm:px-4 py-4 sm:py-8">
         {/* Hero banner */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -152,9 +152,9 @@ function Referrals() {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid gap-4 lg:grid-cols-2">
           {/* Left: referral card + steps */}
-          <div>
+          <div className="min-w-0">
             <ReferralCard code={code} link={link} onCopy={copy} copied={copied} />
 
             {/* How it works */}
@@ -165,19 +165,21 @@ function Referrals() {
               className={cardCls}
             >
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-4">How it works</div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 {[
                   { icon: Share2,     step: "01", title: "Share link",    desc: "Send to friends" },
                   { icon: Users,      step: "02", title: "They deposit",  desc: "Join & deposit" },
                   { icon: TrendingUp, step: "03", title: "Earn 5%",       desc: "Auto-credited" },
                 ].map(({ icon: Icon, step, title, desc }) => (
-                  <div key={step} className="rounded-xl border border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)] p-2.5 text-center">
-                    <div className="h-7 w-7 rounded-lg bg-[rgba(22,219,147,0.08)] border border-[rgba(22,219,147,0.15)] grid place-items-center mx-auto mb-2">
+                  <div key={step} className="rounded-xl border border-[rgba(22,219,147,0.08)] bg-[rgba(22,219,147,0.02)] p-3 text-left sm:text-center grid grid-cols-[auto_minmax(0,1fr)] sm:block gap-3 items-center">
+                    <div className="h-8 w-8 sm:h-7 sm:w-7 rounded-lg bg-[rgba(22,219,147,0.08)] border border-[rgba(22,219,147,0.15)] grid place-items-center sm:mx-auto sm:mb-2 shrink-0">
                       <Icon className="h-3.5 w-3.5 text-[#16DB93]" />
                     </div>
-                    <div className="text-[10px] text-[#16DB93] font-bold mb-0.5">{step}</div>
-                    <div className="text-xs font-semibold leading-tight mb-0.5">{title}</div>
-                    <div className="text-[10px] text-muted-foreground leading-tight">{desc}</div>
+                    <div className="min-w-0">
+                      <div className="text-[10px] text-[#16DB93] font-bold mb-0.5">{step}</div>
+                      <div className="text-xs font-semibold leading-tight mb-0.5 truncate sm:whitespace-normal">{title}</div>
+                      <div className="text-[10px] text-muted-foreground leading-tight">{desc}</div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -185,10 +187,10 @@ function Referrals() {
           </div>
 
           {/* Right: stats + activity */}
-          <div className="flex flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-5">
             {/* Stats */}
             <motion.div
-              className="grid grid-cols-2 gap-3"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-3"
               initial="hidden"
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
@@ -244,24 +246,24 @@ function Referrals() {
                       initial={{ opacity: 0, x: -10 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.45 + i * 0.06 }}
-                      className="py-3 flex justify-between items-center"
+                      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-[rgba(22,219,147,0.06)] border border-[rgba(22,219,147,0.12)] grid place-items-center">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="h-8 w-8 shrink-0 rounded-full bg-[rgba(22,219,147,0.06)] border border-[rgba(22,219,147,0.12)] grid place-items-center">
                           <Users className="h-3.5 w-3.5 text-[#16DB93]/60" />
                         </div>
-                        <div>
-                          <div className="text-sm font-medium">Referred user</div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-medium truncate">Referred user</div>
                           <div className="text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
                         </div>
                       </div>
                       {r.bonus_paid ? (
-                        <div className="text-right">
+                        <div className="shrink-0 text-right">
                           <div className="text-sm font-bold text-[#16DB93]">+${r.bonus_amount.toLocaleString()}</div>
                           <div className="text-[10px] text-muted-foreground">Paid</div>
                         </div>
                       ) : (
-                        <span className="text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">
+                        <span className="shrink-0 text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-full">
                           Pending
                         </span>
                       )}
