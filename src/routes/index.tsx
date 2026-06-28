@@ -399,16 +399,16 @@ function Home() {
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent" />
 
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative mx-auto max-w-5xl px-4 text-center">
+          {/* Live badge */}
+          <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.2 }}
+            className="relative z-30 inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-4 border border-[rgba(22,219,147,0.2)]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
+            <span className="text-muted-foreground">{t("hero.badge")}</span>
+          </motion.div>
+
           {/* 3D Visual — visible on all viewports */}
           <motion.div className="block mb-4 sm:mb-0" initial={{ opacity: 0, y: 40, scale: 0.96 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}>
             <HeroVisual />
-          </motion.div>
-
-          {/* Live badge */}
-          <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 surface-card rounded-full px-4 py-1.5 text-xs mb-3 sm:mb-5 border border-[rgba(22,219,147,0.2)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#16DB93] animate-pulse" />
-            <span className="text-muted-foreground">{t("hero.badge")}</span>
           </motion.div>
 
           {/* Headline — word-by-word reveal */}
