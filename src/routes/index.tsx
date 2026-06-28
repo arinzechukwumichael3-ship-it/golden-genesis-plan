@@ -227,7 +227,7 @@ function HeroVisual() {
   }, [mouseX, mouseY, rotX, rotY]);
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto h-[220px] sm:h-[320px] md:h-[400px] flex items-center justify-center select-none pointer-events-none">
+    <div className="relative w-full max-w-2xl mx-auto h-[350px] sm:h-[320px] md:h-[400px] flex items-center justify-center select-none pointer-events-none">
       {/* Radial glow behind cards */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_70%_at_50%_50%,rgba(13,27,62,0.07),transparent_70%)]" />
 
