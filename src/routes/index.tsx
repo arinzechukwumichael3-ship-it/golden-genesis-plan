@@ -3,9 +3,23 @@ import { motion, useInView, animate, useMotionValue, useSpring, useScroll, useTr
 import { useRef, useEffect, useState, type ReactNode } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Button } from "@/components/ui/button";
-import { Shield, TrendingUp, Wallet, Zap, Users, Lock, ArrowRight, Star, Check, Clock, BarChart3 } from "lucide-react";
+import { Shield, TrendingUp, Wallet, Zap, Users, Lock, ArrowRight, Star, Check, Clock, ChartBar as BarChart3 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useTheme } from "@/hooks/use-theme";
+import { supabase } from "@/integrations/supabase/client";
+import { formatMoney } from "@/lib/invest";
+
+type DbPlan = {
+  id: string;
+  name: string;
+  slug: string;
+  min_amount: number;
+  max_amount: number | null;
+  roi_percent: number;
+  duration_days: number;
+  active: boolean;
+  sort_order: number;
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -382,6 +396,13 @@ function Home() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroY = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const [dbPlans, setDbPlans] = useState<DbPlan[]>([]);
+
+  useEffect(() => {
+    supabase.from("plans").select("*").eq("active", true).order("sort_order").then(({ data }) => {
+      setDbPlans((data as DbPlan[]) || []);
+    });
+  }, []);
 
   return (
     <SiteLayout>
@@ -726,71 +747,70 @@ function Home() {
           </div>
 
           <motion.div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true }}>
-            {[
-              {
-                name: "Basic Plan",
-                sub: "USDT copy trading",
-                featured: false,
-                entries: [["€500","€1,000"],["€600","€1,500"],["€700","€1,800"],["€800","€2,000"],["€900","€2,500"]],
-                features: ["72-hour payouts","5 tier levels","USDT deposits","Email support"],
-              },
-              {
-                name: "VIP Plan",
-                sub: "Elite USDT tiers",
-                featured: true,
-                entries: [["€1k","€5k"],["€2k","€10k"],["€5k","€50k"],["€10k","€100k"]],
-                features: ["Priority payouts","7 tier levels","Highest multipliers","Dedicated support"],
-              },
-              {
-                name: "Premium Plan",
-                sub: "BTC-only trading",
-                featured: false,
-                entries: [["1 BTC","3 BTC"],["2 BTC","6 BTC"],["3 BTC","9 BTC"],["5 BTC","15 BTC"]],
-                features: ["72-hour payouts","5 BTC tiers","3× multiplier","VIP account manager"],
-              },
-            ].map((plan) => (
-              <motion.div key={plan.name} variants={fadeUp}>
-                <motion.div whileHover={{ y: -8, transition: { duration: 0.22 } }}
-                  className={`surface-card rounded-3xl border h-full ${plan.featured ? "border-[rgba(22,219,147,0.35)] animate-glow-pulse" : "border-[rgba(22,219,147,0.1)] hover:border-[rgba(22,219,147,0.28)]"} transition-colors duration-300 overflow-hidden`}>
-                  {plan.featured && (
-                    <div className="gold-gradient text-white text-xs font-bold text-center py-2 tracking-wider">VIP SELECTION</div>
-                  )}
-                  <div className="p-4 sm:p-6 lg:p-8">
-                    <div className="mb-4 sm:mb-6">
-                      <div className="text-xs text-muted-foreground mb-1">{plan.sub}</div>
-                      <h3 className="text-lg sm:text-2xl font-bold">{plan.name}</h3>
-                    </div>
+            {dbPlans.length > 0 ? dbPlans.map((plan, idx) => {
+              const featured = idx === Math.min(1, dbPlans.length - 1);
+              const expectedReturn = (amount: number) => Math.round(amount * (1 + plan.roi_percent / 100) * 100) / 100;
+              const min = plan.min_amount;
+              const max = plan.max_amount || min * 5;
+              const step = (max - min) / 4;
+              const tiers = Array.from({ length: 5 }, (_, i) => {
+                const invest = Math.round(min + step * i);
+                return [invest, expectedReturn(invest)];
+              });
+              const features = [
+                `${plan.duration_days}-day duration`,
+                `${plan.roi_percent}% ROI`,
+                plan.max_amount ? `Max $${formatMoney(plan.max_amount)}` : "Unlimited capital",
+                "Instant activation",
+              ];
+              return (
+                <motion.div key={plan.id} variants={fadeUp}>
+                  <motion.div whileHover={{ y: -8, transition: { duration: 0.22 } }}
+                    className={`surface-card rounded-3xl border h-full ${featured ? "border-[rgba(22,219,147,0.35)] animate-glow-pulse" : "border-[rgba(22,219,147,0.1)] hover:border-[rgba(22,219,147,0.28)]"} transition-colors duration-300 overflow-hidden`}>
+                    {featured && (
+                      <div className="gold-gradient text-white text-xs font-bold text-center py-2 tracking-wider">POPULAR</div>
+                    )}
+                    <div className="p-4 sm:p-6 lg:p-8">
+                      <div className="mb-4 sm:mb-6">
+                        <div className="text-xs text-muted-foreground mb-1">{plan.roi_percent}% returns</div>
+                        <h3 className="text-lg sm:text-2xl font-bold">{plan.name}</h3>
+                      </div>
 
-                    <div className="rounded-2xl border border-[rgba(0,0,0,0.07)] bg-black/[0.02] p-3 sm:p-4 mb-4 sm:mb-6">
-                      <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Return structure</div>
-                      <div className="space-y-2">
-                        {plan.entries.map(([inv, earn]) => (
-                          <div key={inv} className="flex justify-between text-sm border border-[rgba(0,0,0,0.07)] rounded-lg px-3 py-2 bg-black/[0.03]">
-                            <span className="text-muted-foreground">{inv}</span>
-                            <span className="font-semibold text-[#16DB93]">{earn}</span>
+                      <div className="rounded-2xl border border-[rgba(0,0,0,0.07)] bg-black/[0.02] p-3 sm:p-4 mb-4 sm:mb-6">
+                        <div className="text-[10px] text-muted-foreground uppercase tracking-wider mb-3">Return structure</div>
+                        <div className="space-y-2">
+                          {tiers.map(([inv, earn]) => (
+                            <div key={inv} className="flex justify-between text-sm border border-[rgba(0,0,0,0.07)] rounded-lg px-3 py-2 bg-black/[0.03]">
+                              <span className="text-muted-foreground">${formatMoney(inv as number)}</span>
+                              <span className="font-semibold text-[#16DB93]">${formatMoney(earn as number)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 mb-4 sm:mb-6">
+                        {features.map(f => (
+                          <div key={f} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                            <span className="h-4 w-4 rounded-full bg-[rgba(22,219,147,0.15)] grid place-items-center shrink-0">
+                              <Check className="h-2.5 w-2.5 text-[#16DB93]" strokeWidth={3} />
+                            </span>
+                            {f}
                           </div>
                         ))}
                       </div>
-                    </div>
 
-                    <div className="space-y-2 mb-4 sm:mb-6">
-                      {plan.features.map(f => (
-                        <div key={f} className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                          <span className="h-4 w-4 rounded-full bg-[rgba(22,219,147,0.15)] grid place-items-center shrink-0">
-                            <Check className="h-2.5 w-2.5 text-[#16DB93]" strokeWidth={3} />
-                          </span>
-                          {f}
-                        </div>
-                      ))}
+                      <Button className="w-full gold-gradient text-white hover:opacity-95 font-semibold" asChild>
+                        <Link to="/auth" search={{ mode: "register" }}>{t("plans.start")}</Link>
+                      </Button>
                     </div>
-
-                    <Button className="w-full gold-gradient text-white hover:opacity-95 font-semibold" asChild>
-                      <Link to="/auth" search={{ mode: "register" }}>{t("plans.start")}</Link>
-                    </Button>
-                  </div>
+                  </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              );
+            }) : (
+              <div className="col-span-3 text-center py-12 text-muted-foreground">
+                Loading plans...
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </section>

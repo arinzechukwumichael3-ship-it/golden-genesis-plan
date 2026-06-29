@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -8,10 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Briefcase, Wallet, TrendingUp, CalendarDays, Repeat, CheckCircle2,
-  ChevronDown, ChevronRight, ArrowRight, Check,
-} from "lucide-react";
+import { Briefcase, Wallet, TrendingUp, CalendarDays, Repeat, CircleCheck as CheckCircle2, ChevronDown, ChevronRight, ArrowRight, Check, CircleAlert as AlertCircle } from "lucide-react";
 import {
   COIN_META, expectedReturn, formatMoney, paymentKey,
   type CryptoWallet, type Plan,
@@ -32,15 +29,20 @@ function NewInvestment() {
   const [amount, setAmount] = useState<string>("");
   const [planOpen, setPlanOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [userBalance, setUserBalance] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
-      const [{ data: pl }, { data: wl }] = await Promise.all([
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return;
+      const [{ data: pl }, { data: wl }, { data: profile }] = await Promise.all([
         supabase.from("plans").select("*").eq("active", true).order("sort_order"),
         supabase.from("crypto_wallets").select("*").eq("is_active", true).order("sort_order"),
+        supabase.from("profiles").select("balance").eq("id", u.user.id).maybeSingle(),
       ]);
       setPlans((pl as Plan[]) || []);
       setWallets((wl as CryptoWallet[]) || []);
+      setUserBalance(Number(profile?.balance) || 0);
     })();
   }, []);
 
@@ -55,11 +57,16 @@ function NewInvestment() {
 
   const inRange = plan ? amt >= Number(plan.min_amount) && (plan.max_amount == null || amt <= Number(plan.max_amount)) : false;
   const earn = plan && inRange ? expectedReturn(amt, Number(plan.roi_percent)) : 0;
+  const hasInsufficientBalance = amt > userBalance;
 
-  const canSubmit = !!plan && !!wallet && inRange && !submitting;
+  const canSubmit = !!plan && !!wallet && inRange && !hasInsufficientBalance && !submitting;
 
   const submit = async () => {
     if (!plan || !wallet) return;
+    if (userBalance < amt) {
+      toast.error("Insufficient balance. Please make a deposit first.");
+      return;
+    }
     setSubmitting(true);
     const { data, error } = await supabase.rpc("create_pending_investment", {
       _plan_id: plan.id,
@@ -82,6 +89,27 @@ function NewInvestment() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">New Investment Plan</h1>
             <p className="text-sm text-slate-500">Choose a plan, crypto, and amount. Your funds remain pending until payment is confirmed.</p>
           </header>
+
+          {/* Balance card */}
+          <Card className="bg-white border-slate-200/70 shadow-sm rounded-2xl">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl grid place-items-center" style={{ background: `${TEAL}15`, color: TEAL }}>
+                  <Wallet className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-slate-400">Available Balance</div>
+                  <div className="text-xl font-bold text-slate-900">${formatMoney(userBalance)}</div>
+                </div>
+              </div>
+              {userBalance < (plan?.min_amount || 0) && (
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 border border-red-200 text-xs text-red-600">
+                  <AlertCircle className="h-3.5 w-3.5" />
+                  Insufficient
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Plan selection */}
           <Card className="bg-white border-slate-200/70 shadow-sm rounded-2xl">
@@ -242,6 +270,12 @@ function NewInvestment() {
               )}
               {plan && amount && !inRange && (
                 <div className="text-xs text-red-500">Amount must be between ${formatMoney(Number(plan.min_amount))}{plan.max_amount ? ` and $${formatMoney(Number(plan.max_amount))}` : ""}.</div>
+              )}
+              {plan && amount && inRange && hasInsufficientBalance && (
+                <div className="flex items-center gap-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                  <span>Insufficient balance. Please <Link to="/deposit" className="underline font-medium">make a deposit</Link> first.</span>
+                </div>
               )}
             </CardContent>
           </Card>
