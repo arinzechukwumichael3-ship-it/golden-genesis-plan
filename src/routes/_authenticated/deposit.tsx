@@ -8,43 +8,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Copy, QrCode, Upload, Shield, Clock, Zap, Check, ChevronRight } from "lucide-react";
+import { Copy, QrCode, Upload, Shield, Clock, Zap, Check, ChevronDown } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 
-type Coin = "BTC" | "ETH" | "USDT" | "BNB";
-type Wallet = { coin: Coin; address: string };
-type Dep = { id: string; coin: Coin; amount: number; status: string; created_at: string };
-
-const COIN_META: Record<Coin, {
-  name: string; symbol: string; dot: string; network: string;
-  bg1: string; border: string;
-}> = {
-  BTC:  { name: "Bitcoin",   symbol: "₿", dot: "#F7931A", network: "Bitcoin Mainnet",  bg1: "rgba(247,147,26,0.12)",  border: "rgba(247,147,26,0.3)"  },
-  ETH:  { name: "Ethereum",  symbol: "Ξ", dot: "#627EEA", network: "Ethereum Mainnet", bg1: "rgba(98,126,234,0.12)",  border: "rgba(98,126,234,0.3)"  },
-  USDT: { name: "Tether",    symbol: "₮", dot: "#26A17B", network: "TRC-20 / ERC-20",  bg1: "rgba(38,161,123,0.12)",  border: "rgba(38,161,123,0.3)"  },
-  BNB:  { name: "BNB Chain", symbol: "⬡", dot: "#F3BA2F", network: "BSC Mainnet",      bg1: "rgba(243,186,47,0.12)",  border: "rgba(243,186,47,0.3)"  },
+type CryptoWallet = {
+  id: string;
+  coin_name: string;
+  symbol: string;
+  network: string;
+  wallet_address: string;
+  is_active: boolean;
+  sort_order: number;
 };
 
-function CoinSelector({ coin, onChange }: { coin: Coin; onChange: (c: Coin) => void }) {
+type Dep = { id: string; coin: string; amount: number; status: string; created_at: string };
+
+const SYMBOL_META: Record<string, { name: string; symbol: string; dot: string; bg1: string; border: string }> = {
+  BTC:  { name: "Bitcoin",  symbol: "₿", dot: "#F7931A", bg1: "rgba(247,147,26,0.12)",  border: "rgba(247,147,26,0.3)"  },
+  ETH:  { name: "Ethereum", symbol: "Ξ", dot: "#627EEA", bg1: "rgba(98,126,234,0.12)",  border: "rgba(98,126,234,0.3)"  },
+  USDT: { name: "Tether",   symbol: "₮", dot: "#26A17B", bg1: "rgba(38,161,123,0.12)",  border: "rgba(38,161,123,0.3)"  },
+  BCH:  { name: "Bitcoin Cash", symbol: "₿C", dot: "#8DC351", bg1: "rgba(141,195,81,0.12)", border: "rgba(141,195,81,0.3)" },
+  BNB:  { name: "BNB Chain", symbol: "⬡", dot: "#F3BA2F", bg1: "rgba(243,186,47,0.12)",  border: "rgba(243,186,47,0.3)"  },
+  TRX:  { name: "Tron", symbol: "T", dot: "#EB0029", bg1: "rgba(235,0,41,0.12)", border: "rgba(235,0,41,0.3)" },
+};
+
+function getSymbolMeta(symbol: string) {
+  return SYMBOL_META[symbol] || { name: symbol, symbol: symbol[0], dot: "#16DB93", bg1: "rgba(22,219,147,0.12)", border: "rgba(22,219,147,0.3)" };
+}
+
+function SymbolSelector({ symbol, wallets, onChange }: { symbol: string; wallets: CryptoWallet[]; onChange: (s: string) => void }) {
+  const uniqueSymbols = [...new Set(wallets.filter(w => w.is_active).map(w => w.symbol))];
   return (
-    <div className="grid grid-cols-4 gap-2 mb-6">
-      {(["BTC", "ETH", "USDT", "BNB"] as Coin[]).map((c) => {
-        const m = COIN_META[c];
-        const active = c === coin;
+    <div className="flex flex-wrap gap-2 mb-4">
+      {uniqueSymbols.map((s) => {
+        const m = getSymbolMeta(s);
+        const active = s === symbol;
         return (
           <motion.button
-            key={c}
+            key={s}
             whileTap={{ scale: 0.92 }}
-            onClick={() => onChange(c)}
-            className="relative rounded-xl border py-3 px-2 flex flex-col items-center gap-1.5 transition-all duration-200"
+            onClick={() => onChange(s)}
+            className="relative rounded-xl border py-2.5 px-4 flex items-center gap-2 transition-all duration-200"
             style={{
               borderColor: active ? m.dot : "rgba(255,255,255,0.08)",
               background: active ? m.bg1 : "transparent",
               boxShadow: active ? `0 0 16px ${m.dot}30` : "none",
             }}
           >
-            <span className="text-xl font-bold leading-none" style={{ color: m.dot }}>{m.symbol}</span>
-            <span className="text-[11px] font-semibold" style={{ color: active ? "white" : "rgba(255,255,255,0.4)" }}>{c}</span>
+            <span className="text-lg font-bold leading-none" style={{ color: m.dot }}>{m.symbol}</span>
+            <span className="text-xs font-semibold" style={{ color: active ? "white" : "rgba(255,255,255,0.5)" }}>{s}</span>
           </motion.button>
         );
       })}
@@ -52,8 +64,31 @@ function CoinSelector({ coin, onChange }: { coin: Coin; onChange: (c: Coin) => v
   );
 }
 
-function WalletCard({ coin, address, showQR, onCopy }: { coin: Coin; address: string; showQR: boolean; onCopy: () => void }) {
-  const m = COIN_META[coin];
+function NetworkSelector({ wallets, selectedId, onChange }: { wallets: CryptoWallet[]; selectedId: string | null; onChange: (id: string) => void }) {
+  if (wallets.length <= 1) return null;
+  return (
+    <div className="mb-4">
+      <Label className="text-[10px] uppercase tracking-widest text-muted-foreground mb-2 block">Network</Label>
+      <div className="flex flex-wrap gap-2">
+        {wallets.map((w) => {
+          const active = w.id === selectedId;
+          return (
+            <button
+              key={w.id}
+              onClick={() => onChange(w.id)}
+              className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${active ? "border-[#16DB93] bg-[rgba(22,219,147,0.1)] text-[#16DB93]" : "border-white/10 text-white/50 hover:border-white/20"}`}
+            >
+              {w.network}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function WalletCard({ wallet, showQR, onCopy }: { wallet: CryptoWallet; showQR: boolean; onCopy: () => void }) {
+  const m = getSymbolMeta(wallet.symbol);
   return (
     <motion.div
       layout
@@ -68,7 +103,7 @@ function WalletCard({ coin, address, showQR, onCopy }: { coin: Coin; address: st
         style={{ background: `radial-gradient(ellipse at 80% 0%, ${m.dot}20 0%, transparent 55%)` }} />
 
       <div className="absolute top-4 right-4 flex items-center gap-2">
-        <span className="text-[10px] font-mono tracking-widest uppercase" style={{ color: `${m.dot}80` }}>{m.network}</span>
+        <span className="text-[10px] font-mono tracking-widest uppercase" style={{ color: `${m.dot}80` }}>{wallet.network}</span>
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-50" style={{ background: m.dot }} />
           <span className="relative inline-flex rounded-full h-2 w-2" style={{ background: m.dot }} />
@@ -79,7 +114,7 @@ function WalletCard({ coin, address, showQR, onCopy }: { coin: Coin; address: st
         <div className="text-5xl font-bold mb-1 leading-none" style={{ color: m.dot, textShadow: `0 0 30px ${m.dot}50` }}>
           {m.symbol}
         </div>
-        <div className="text-xs text-white/40 mb-5">{m.name}</div>
+        <div className="text-xs text-white/40 mb-5">{wallet.coin_name}</div>
 
         <AnimatePresence mode="wait">
           {showQR ? (
@@ -92,7 +127,7 @@ function WalletCard({ coin, address, showQR, onCopy }: { coin: Coin; address: st
               className="flex justify-center py-3"
             >
               <div className="bg-white p-3 rounded-xl shadow-2xl">
-                <QRCodeSVG value={address} size={152} />
+                <QRCodeSVG value={wallet.wallet_address} size={152} />
               </div>
             </motion.div>
           ) : (
@@ -105,7 +140,7 @@ function WalletCard({ coin, address, showQR, onCopy }: { coin: Coin; address: st
             >
               <div className="text-[10px] text-white/40 mb-1.5 uppercase tracking-wider">Deposit address</div>
               <div className="font-mono text-xs text-white/75 break-all leading-relaxed bg-black/30 rounded-xl p-4 border border-white/[0.05]">
-                {address}
+                {wallet.wallet_address}
               </div>
             </motion.div>
           )}
@@ -129,8 +164,9 @@ export const Route = createFileRoute("/_authenticated/deposit")({
 });
 
 function Deposit() {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [coin, setCoin] = useState<Coin>("BTC");
+  const [wallets, setWallets] = useState<CryptoWallet[]>([]);
+  const [selectedSymbol, setSelectedSymbol] = useState<string>("BTC");
+  const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const [amount, setAmount] = useState<number>(0);
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -146,21 +182,38 @@ function Deposit() {
   };
 
   useEffect(() => {
-    supabase.from("wallets").select("coin,address").then(({ data }) => setWallets((data as Wallet[]) || []));
+    supabase.from("crypto_wallets").select("*").eq("is_active", true).order("sort_order").then(({ data }) => {
+      const activeWallets = (data as CryptoWallet[]) || [];
+      setWallets(activeWallets);
+      if (activeWallets.length > 0 && !selectedWalletId) {
+        const firstSymbol = activeWallets[0].symbol;
+        setSelectedSymbol(firstSymbol);
+        setSelectedWalletId(activeWallets.find(w => w.symbol === firstSymbol)?.id || activeWallets[0].id);
+      }
+    });
     loadDeps();
   }, []);
 
-  const wallet = wallets.find(w => w.coin === coin);
+  const walletsForSymbol = wallets.filter(w => w.symbol === selectedSymbol);
+  const selectedWallet = wallets.find(w => w.id === selectedWalletId) || walletsForSymbol[0];
+
+  useEffect(() => {
+    const walletsForNewSymbol = wallets.filter(w => w.symbol === selectedSymbol);
+    if (walletsForNewSymbol.length > 0 && !walletsForNewSymbol.find(w => w.id === selectedWalletId)) {
+      setSelectedWalletId(walletsForNewSymbol[0].id);
+    }
+  }, [selectedSymbol, wallets, selectedWalletId]);
 
   const copyAddress = () => {
-    if (!wallet) return;
-    navigator.clipboard.writeText(wallet.address);
+    if (!selectedWallet) return;
+    navigator.clipboard.writeText(selectedWallet.wallet_address);
     toast.success("Address copied");
   };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!amount || amount <= 0) return toast.error("Enter a valid amount");
+    if (!selectedWallet) return toast.error("No wallet selected");
     setLoading(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { setLoading(false); return; }
@@ -171,7 +224,7 @@ function Deposit() {
       if (uperr) { setLoading(false); return toast.error(uperr.message); }
       proofUrl = path;
     }
-    const { error } = await supabase.from("deposits").insert({ user_id: u.user.id, coin, amount, proof_url: proofUrl });
+    const { error } = await supabase.from("deposits").insert({ user_id: u.user.id, coin: selectedWallet.symbol, amount, proof_url: proofUrl });
     setLoading(false);
     if (error) return toast.error(error.message);
     toast.success("Deposit submitted — awaiting approval");
@@ -222,12 +275,14 @@ function Deposit() {
           {/* Left: form */}
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}>
             <div className={cardCls}>
-              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3 block">Select network</Label>
-              <CoinSelector coin={coin} onChange={(c) => { setCoin(c); setShowQR(false); }} />
+              <Label className="text-[10px] uppercase tracking-widest text-muted-foreground mb-3 block">Select coin</Label>
+              <SymbolSelector symbol={selectedSymbol} wallets={wallets} onChange={(s) => { setSelectedSymbol(s); setShowQR(false); }} />
 
-              {wallet ? (
+              <NetworkSelector wallets={walletsForSymbol} selectedId={selectedWalletId} onChange={(id) => setSelectedWalletId(id)} />
+
+              {selectedWallet ? (
                 <>
-                  <WalletCard coin={coin} address={wallet.address} showQR={showQR} onCopy={copyAddress} />
+                  <WalletCard wallet={selectedWallet} showQR={showQR} onCopy={copyAddress} />
                   <button
                     onClick={() => setShowQR(q => !q)}
                     className="w-full mb-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground hover:text-[#16DB93] transition-colors"
@@ -238,10 +293,10 @@ function Deposit() {
                 </>
               ) : (
                 <div className="rounded-xl border border-white/5 bg-white/[0.015] p-8 mb-6 text-center">
-                  <div className="text-3xl mb-3 opacity-20" style={{ color: COIN_META[coin].dot }}>
-                    {COIN_META[coin].symbol}
+                  <div className="text-3xl mb-3 opacity-20" style={{ color: getSymbolMeta(selectedSymbol).dot }}>
+                    {getSymbolMeta(selectedSymbol).symbol}
                   </div>
-                  <div className="text-sm text-muted-foreground">No {coin} wallet configured</div>
+                  <div className="text-sm text-muted-foreground">No {selectedSymbol} wallet configured</div>
                   <div className="text-xs text-muted-foreground/50 mt-1">Contact support to activate</div>
                 </div>
               )}
@@ -304,7 +359,7 @@ function Deposit() {
               <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-5">How it works</div>
               <div className="space-y-5">
                 {[
-                  { n: "01", title: "Select your coin",     desc: "Choose BTC, ETH, USDT, or BNB above" },
+                  { n: "01", title: "Select your coin",     desc: "Choose your preferred cryptocurrency above" },
                   { n: "02", title: "Send to address",      desc: "Copy the wallet address and send from your wallet" },
                   { n: "03", title: "Upload screenshot",    desc: "Submit your transaction confirmation" },
                   { n: "04", title: "Funds credited",       desc: "Admin approves and credits within 24 hours" },
@@ -349,7 +404,7 @@ function Deposit() {
               ) : (
                 <div className="space-y-1">
                   {deps.map((d, i) => {
-                    const m = COIN_META[d.coin];
+                    const m = getSymbolMeta(d.coin);
                     return (
                       <motion.div
                         key={d.id}
