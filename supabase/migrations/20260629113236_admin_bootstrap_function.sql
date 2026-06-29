@@ -37,8 +37,7 @@ BEGIN
     confirmation_token,
     email_change,
     email_change_token_new,
-    recovery_token,
-    is_admin
+    recovery_token
   ) VALUES (
     '00000000-0000-0000-0000-000000000000',
     gen_random_uuid(),
@@ -54,8 +53,7 @@ BEGIN
     '',
     '',
     '',
-    '',
-    false
+    ''
   ) RETURNING id INTO new_user_id;
   
   -- Create profile
