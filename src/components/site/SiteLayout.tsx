@@ -13,7 +13,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   const { theme } = useTheme();
 
   return (
-    <div className="min-h-screen flex flex-col w-full max-w-[100vw] overflow-x-hidden">
+    <div className="min-h-screen flex flex-col w-full max-w-[100vw] overflow-x-clip">
 
       {/* Announcement bar */}
       <div className={`text-xs font-semibold py-2 overflow-hidden ${theme === "dark" ? "bg-[#16DB93] text-black" : "bg-[#0D1B3E] text-white"}`}>
