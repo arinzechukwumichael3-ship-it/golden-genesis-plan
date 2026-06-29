@@ -29,6 +29,7 @@ import { Route as AuthenticatedInvestEarningsRouteImport } from './routes/_authe
 import { Route as AuthenticatedAdminWithdrawalsRouteImport } from './routes/_authenticated/admin/withdrawals'
 import { Route as AuthenticatedAdminWalletsRouteImport } from './routes/_authenticated/admin/wallets'
 import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin/users'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin/settings'
 import { Route as AuthenticatedAdminReferralsRouteImport } from './routes/_authenticated/admin/referrals'
 import { Route as AuthenticatedAdminPlansRouteImport } from './routes/_authenticated/admin/plans'
 import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin/notifications'
@@ -140,6 +141,12 @@ const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminReferralsRoute =
   AuthenticatedAdminReferralsRouteImport.update({
     id: '/referrals',
@@ -199,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -226,6 +234,7 @@ export interface FileRoutesByTo {
   '/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -256,6 +265,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/notifications': typeof AuthenticatedAdminNotificationsRoute
   '/_authenticated/admin/plans': typeof AuthenticatedAdminPlansRoute
   '/_authenticated/admin/referrals': typeof AuthenticatedAdminReferralsRoute
+  '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/admin/wallets': typeof AuthenticatedAdminWalletsRoute
   '/_authenticated/admin/withdrawals': typeof AuthenticatedAdminWithdrawalsRoute
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/plans'
     | '/admin/referrals'
+    | '/admin/settings'
     | '/admin/users'
     | '/admin/wallets'
     | '/admin/withdrawals'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/admin/notifications'
     | '/admin/plans'
     | '/admin/referrals'
+    | '/admin/settings'
     | '/admin/users'
     | '/admin/wallets'
     | '/admin/withdrawals'
@@ -342,6 +354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/notifications'
     | '/_authenticated/admin/plans'
     | '/_authenticated/admin/referrals'
+    | '/_authenticated/admin/settings'
     | '/_authenticated/admin/users'
     | '/_authenticated/admin/wallets'
     | '/_authenticated/admin/withdrawals'
@@ -506,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/referrals': {
       id: '/_authenticated/admin/referrals'
       path: '/referrals'
@@ -563,6 +583,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminNotificationsRoute: typeof AuthenticatedAdminNotificationsRoute
   AuthenticatedAdminPlansRoute: typeof AuthenticatedAdminPlansRoute
   AuthenticatedAdminReferralsRoute: typeof AuthenticatedAdminReferralsRoute
+  AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
   AuthenticatedAdminWalletsRoute: typeof AuthenticatedAdminWalletsRoute
   AuthenticatedAdminWithdrawalsRoute: typeof AuthenticatedAdminWithdrawalsRoute
@@ -574,6 +595,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminNotificationsRoute: AuthenticatedAdminNotificationsRoute,
   AuthenticatedAdminPlansRoute: AuthenticatedAdminPlansRoute,
   AuthenticatedAdminReferralsRoute: AuthenticatedAdminReferralsRoute,
+  AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
   AuthenticatedAdminWalletsRoute: AuthenticatedAdminWalletsRoute,
   AuthenticatedAdminWithdrawalsRoute: AuthenticatedAdminWithdrawalsRoute,

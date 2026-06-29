@@ -1,16 +1,28 @@
 import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { BottomNav } from "./BottomNav";
 import { useAuth } from "@/hooks/use-auth";
 import { useTheme } from "@/hooks/use-theme";
-
-const WHATSAPP_NUMBER = "9122646692";
-const WHATSAPP_MSG = encodeURIComponent("Hello YieldEmpire Support, I need help with my account.");
+import { supabase } from "@/integrations/supabase/client";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { theme } = useTheme();
+  const [whatsappNumber, setWhatsappNumber] = useState("9122646692");
+  const [whatsappMessage, setWhatsappMessage] = useState("Hello YieldEmpire Support, I need help with my account.");
+
+  useEffect(() => {
+    supabase.from("site_settings").select("key, value").in("key", ["whatsapp_number", "whatsapp_message"]).then(({ data }) => {
+      if (data) {
+        data.forEach((s: { key: string; value: string }) => {
+          if (s.key === "whatsapp_number") setWhatsappNumber(s.value);
+          if (s.key === "whatsapp_message") setWhatsappMessage(s.value);
+        });
+      }
+    });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col w-full max-w-[100vw] overflow-x-clip">
@@ -41,7 +53,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
 
       {/* WhatsApp support button — left side on mobile to avoid covering right-side content */}
       <a
-        href={`https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MSG}`}
+        href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat on WhatsApp"
