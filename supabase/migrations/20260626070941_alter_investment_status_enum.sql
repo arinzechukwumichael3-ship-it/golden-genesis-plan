@@ -1,0 +1,1 @@
+ALTER TYPE public.investment_status ADD VALUE IF NOT EXISTS 'pending' BEFORE 'active';
