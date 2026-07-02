@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "golden-genesis-plan",
+  "name": "arinzechukwumichael3-ship-it-golden-genesis-plan",
   "compatibility_date": "2026-06-13",
   "observability": {
     "enabled": true
